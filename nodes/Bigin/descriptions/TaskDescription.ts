@@ -1,6 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-import { makeDelete, makeGet, makeGetAll, makeGetMany,  makeGetPicklistValues,  makeInputMode, makePatch, makeRecordsListInput, makeUpdate, makeUpsert } from './SharedFields';
+import { makeDelete, makeGet, makeGetAll, makeGetMany,  makeGetPicklistValues,  makeInputMode, makePatch, makeRecordsListInput, makeUpdate } from './SharedFields';
 export const taskOperations: INodeProperties[] = [
     {
         displayName: 'Operation',
@@ -24,12 +24,6 @@ export const taskOperations: INodeProperties[] = [
                 value: 'Create',
                 description: 'Create a task',
                 action: 'Create a task',
-            },
-            {
-                name: 'Create Or Update',
-                value: 'Upsert',
-                description: 'Create a new record, or update the current one if it already exists (upsert)',
-                action: 'Create or update a task',
             },
             {
                 name: 'Delete',
@@ -87,7 +81,6 @@ export const taskOperations: INodeProperties[] = [
 
 export const taskFields: INodeProperties[] = [
         ...makeInputMode('Tasks'),
-        ...makeUpsert('Tasks'),
     
         ...makeUpdate('Tasks'),
         ...makePatch('Tasks'),
