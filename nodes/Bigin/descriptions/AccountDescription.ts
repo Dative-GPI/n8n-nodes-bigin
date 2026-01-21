@@ -13,7 +13,7 @@ export const accountOperations: INodeProperties[] = [
 				resource: ['Accounts'],
 			},
 		},
-		default: 'Create',
+		default: 'Get',
 		options: [
 			{
 				'name': 'Count',
