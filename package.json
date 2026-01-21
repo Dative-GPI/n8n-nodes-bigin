@@ -1,0 +1,51 @@
+{
+    "name": "n8n-nodes-bigin",
+    "version": "0.1.8",
+    "description": "n8n community node for Zoho Bigin",
+    "license": "MIT",
+    "homepage": "https://github.com/Dative-GPI/n8n-nodes-bigin.git",
+    "keywords": [
+        "n8n-community-node-package"
+    ],
+    "author": {
+        "name": "Dative",
+        "email": "dev@dative-gpi.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Dative-GPI/n8n-nodes-bigin.git"
+    },
+    "scripts": {
+        "build": "n8n-node build",
+        "build:watch": "tsc --watch",
+        "dev": "n8n-node dev",
+        "start": "n8n start",
+        "lint": "n8n-node lint",
+        "lint:fix": "n8n-node lint --fix",
+        "release": "n8n-node release"
+    },
+    "files": [
+        "dist"
+    ],
+    "n8n": {
+        "n8nNodesApiVersion": 1,
+        "credentials": [
+            "dist/credentials/BiginOAuth2Api.credentials.js"
+        ],
+        "nodes": [
+            "dist/nodes/Bigin/Bigin.node.js"
+        ]
+    },
+    "devDependencies": {
+        "@n8n/node-cli": "*",
+        "@types/estree": "^1.0.8",
+        "eslint": "9.32.0",
+        "prettier": "3.6.2",
+        "release-it": "^19.0.4",
+        "typescript": "^5.9.3",
+        "@types/lodash": "4.17.21"
+    },
+    "peerDependencies": {
+        "n8n-workflow": "*"
+    }
+}

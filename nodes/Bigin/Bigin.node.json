@@ -1,0 +1,30 @@
+{
+	"node": "n8n-nodes-bigin.bigin",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Communication", "Sales", "CRM"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://www.bigin.com/developer/docs/apis/v2/oauth-overview.html"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/your-repo/n8n-nodes-bigin#readme" 
+			}
+		],
+		"generic": [
+			{
+				"label": "Automate your small business CRM with Bigin",
+				"icon": "business",
+				"url": "https://www.zoho.com/bigin/"
+			},
+			{
+				"label": "Bigin API Documentation",
+				"icon": "code",
+				"url": "https://www.zoho.com/bigin/developer/api/v2/"
+			}
+		]
+	}
+}
