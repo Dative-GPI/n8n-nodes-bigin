@@ -96,7 +96,7 @@ export const contactOperations: INodeProperties[] = [
 				'action': 'Get all calls linked to a contact'
 			},
 			{
-				'name': 'Update all fields',
+				'name': 'Update All fields',
 				'value': 'Update',
 				'description': 'Update a contact',
 				'action': 'Update a contact'

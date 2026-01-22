@@ -864,7 +864,27 @@ export const mapMetadataToOptions = (fields: BiginFieldMetadata[]) =>
   }));
 
 
+//Owner,
 
+export const getDefaultValue = (dataType: BiginDataTypes, apiName: string): any => {
+	// Edge Case: These fields are consistently arrays in Bigin records 
+	// even if metadata classifies them differently (e.g., Tag as text)
+	const arrayFields = ['Tag', 'Actions'];
+	if (arrayFields.includes(apiName)) {
+		return [];
+	}
+
+	switch (dataType) {
+		case BiginDataTypes.boolean:
+			return false;
+		case BiginDataTypes.multiselectpicklist:
+			return [];
+		// For all other types: text, picklist, email, phone, datetime, lookup, textarea, date, integer, etc.
+		// Bigin's native "empty" state in fresh records is null.
+		default:
+			return null;
+	}
+};
 
 export async function getSearchableFields(this: ILoadOptionsFunctions | IExecuteFunctions,	module: Resource): Promise<BiginFieldMetadata[]> {
     return filterSearchableFields(await getFieldsMetadata.call(this, module))
@@ -943,47 +963,46 @@ export function filterFilterableFields(fields: BiginFieldMetadata[]): BiginField
     return metadata;
   }
 
+    export async function getStages(this: ILoadOptionsFunctions | IExecuteFunctions, subPipelineName: string): Promise<{ name: string; value: string }[]> {             
+              const responseData = (await zohoApiRequest.call(
+                  this,
+                  Methods.GET,
+                  ModuleEndpoints.Layouts,
+                  {},
+                  { module: Resource.Pipelines },
+              )) as LoadedPipelineLayouts;
+              
+              if (!responseData.layouts?.length) return [];
+              
+              const matchingLayouts = responseData.layouts.filter((layout: PipelineLayout) => {
+                  return layout.profiles?.some(
+                      (profile) => profile._default_assignment_view?.name === subPipelineName
+                  );
+              });
+              
+              const stagePickListOptions = matchingLayouts
+                  .flatMap(layout => layout.sections)
+                  .flatMap(section => section.fields)
+                  .filter(field => field.api_name === 'Sub_Pipeline')
+                  .flatMap(field => field.pick_list_values || [])
+                  .filter(pickValue => pickValue.display_value === subPipelineName)
+                  .flatMap(pickValue => pickValue.maps || [])
+                  .flatMap(map => map.pick_list_values || []);
+              
+              let stages = stagePickListOptions.map(o => ({
+                  name: o.display_value,
+                  value: o.actual_value,
+              }));
 
-      export async function getStages(this: ILoadOptionsFunctions | IExecuteFunctions, subPipelineName: string): Promise<{ name: string; value: string }[]> {             
-                const responseData = (await zohoApiRequest.call(
-                    this,
-                    Methods.GET,
-                    ModuleEndpoints.Layouts,
-                    {},
-                    { module: Resource.Pipelines },
-                )) as LoadedPipelineLayouts;
-                
-                if (!responseData.layouts?.length) return [];
-                
-                const matchingLayouts = responseData.layouts.filter((layout: PipelineLayout) => {
-                    return layout.profiles?.some(
-                        (profile) => profile._default_assignment_view?.name === subPipelineName
-                    );
-                });
-                
-                const stagePickListOptions = matchingLayouts
-                    .flatMap(layout => layout.sections)
-                    .flatMap(section => section.fields)
-                    .filter(field => field.api_name === 'Sub_Pipeline')
-                    .flatMap(field => field.pick_list_values || [])
-                    .filter(pickValue => pickValue.display_value === subPipelineName)
-                    .flatMap(pickValue => pickValue.maps || [])
-                    .flatMap(map => map.pick_list_values || []);
-                
-                let stages = stagePickListOptions.map(o => ({
-                    name: o.display_value,
-                    value: o.actual_value,
-                }));
+              stages = stages.sort((a,b) =>a.name.localeCompare(b.name) )
 
-                stages = stages.sort((a,b) =>a.name.localeCompare(b.name) )
-
-                
-                const uniqueStages = stages.filter((stage, index, self) =>
-                    index === self.findIndex((s) => s.value === stage.value)
-                );
-                
-                return uniqueStages;
-        }
+              
+              const uniqueStages = stages.filter((stage, index, self) =>
+                  index === self.findIndex((s) => s.value === stage.value)
+              );
+              
+              return uniqueStages;
+      }
 
       export async function getSubPipelines(this: ILoadOptionsFunctions | IExecuteFunctions): Promise<{ display_value: string; actual_value: string }[]> {             
 

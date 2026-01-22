@@ -130,4 +130,4 @@ Due to n8n limitations there are some limitations on loading values dynamically 
 
 ## Version history
 
-- **1.0.0**: Initial Release using Zoho Bigin API v2. Supports all core modules and COQL filtering.
+- **0.1.0**: Initial Release using Zoho Bigin API v2. Supports all core modules and COQL filtering.

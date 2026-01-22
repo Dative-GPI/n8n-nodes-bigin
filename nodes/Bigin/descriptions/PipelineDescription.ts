@@ -11,6 +11,7 @@ import {
 	makeRecordsListInput,
 } from './SharedFields';
 
+//Buggy api for write operations
 export const pipelineOperations: INodeProperties[] = [
 	{
 		displayName: 'Operation',

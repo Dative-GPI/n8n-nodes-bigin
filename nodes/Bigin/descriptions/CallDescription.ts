@@ -1,7 +1,7 @@
 /* eslint-disable n8n-nodes-base/node-param-default-wrong-for-options */
 
 import type { INodeProperties } from 'n8n-workflow';
-import {  makeDelete, makeGet, makeGetAll, makeGetMany, makeGetPicklistValues, makeInputMode, makePatch, makeRecordsListInput, makeUpdate } from './SharedFields';
+import {  makeDelete, makeGet, makeGetAll, makeGetMany, makeGetPicklistValues, makeInputMode,  makeRecordsListInput} from './SharedFields';
 
 
 export const callsOperations: INodeProperties[] = [
@@ -54,18 +54,18 @@ export const callsOperations: INodeProperties[] = [
                 'description': 'Get the values of a picklist',
                 'action': 'Get the values of a picklist'
             },
-            {
-                'name': 'Update All Fields',
-                'value': 'Update',
-                'description': 'Update a call',
-                'action': 'Update a call'
-            },
-            {
-                'name': 'Update Specific Fields',
-                'value': 'Patch',
-                'description': 'Update specific fields of a call',
-                'action': 'Patch a call'
-            },
+            // {
+            //     'name': 'Update All Fields',
+            //     'value': 'Update',
+            //     'description': 'Update a call',
+            //     'action': 'Update a call'
+            // },
+            // {
+            //     'name': 'Update Specific Fields',
+            //     'value': 'Patch',
+            //     'description': 'Update specific fields of a call',
+            //     'action': 'Patch a call'
+            // },
         ],
 
         displayOptions: {
@@ -83,8 +83,8 @@ export const callsFields: INodeProperties[] = [
 
     ...makeInputMode('Calls'),
 
-    ...makeUpdate('Calls'),
-    ...makePatch('Calls'),
+    // ...makeUpdate('Calls'),
+    // ...makePatch('Calls'),
     ...makeRecordsListInput('Calls'),
 
     ...makeGetPicklistValues('Calls'),

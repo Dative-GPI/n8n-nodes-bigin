@@ -396,6 +396,13 @@ export const BannedFields = {
 export type BannedFields = typeof BiginDataTypes[keyof typeof BiginDataTypes];
 
 
+export const GlitchyField = {
+  $se_module : '$se_module',
+  Full_Name: 'Full_Name',
+  $related_module: '$related_module',
+}
+export type GlitchyField = typeof GlitchyField[keyof typeof GlitchyField];
+
 export type IdLocator = {
 	mode: 'id' | 'url' | 'list';
 	value: string;

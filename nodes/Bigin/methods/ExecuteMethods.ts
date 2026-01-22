@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IDataObject, IExecuteFunctions, INodeExecutionData, NodeOperationError } from "n8n-workflow";
-import { Resource,  getEndpoint,  InputModes, LoadedPipelineLayouts, Methods, ModuleEndpoints, Operation, OrderByClause, IdLocator} from "../types";
-import { buildCoqlQuery, buildWhereConditions, extractId, filterSearchableFields, getFields,  getFieldsAsString, getFieldsMetadata, getPicklistValues, getRequiredFieldsMetadata, getStages, getSubPipelines, mapMetadataToOptions, zohoApiBatchedRequest, zohoApiCoqlRequest, zohoApiRequest, zohoApiRequestAllItemsBatch } from "./GenericFunctions";
+import { IDataObject, IExecuteFunctions, INodeExecutionData } from "n8n-workflow";
+import { Resource,  getEndpoint,  InputModes, LoadedPipelineLayouts, Methods, ModuleEndpoints, Operation, OrderByClause, IdLocator, BiginDataTypes, GlitchyField} from "../types";
+import { buildCoqlQuery, buildWhereConditions, extractId, filterSearchableFields, getDefaultValue, getFields,  getFieldsAsString, getFieldsMetadata, getPicklistValues, getRequiredFieldsMetadata, getSearchableFields, getStages, getSubPipelines, mapMetadataToOptions, zohoApiBatchedRequest, zohoApiCoqlRequest, zohoApiRequest, zohoApiRequestAllItemsBatch } from "./GenericFunctions";
 
 
 
@@ -231,94 +231,146 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 				}		
 				else if (operation === Operation.Patch || operation === Operation.Update) {
 					const Inputmode = this.getNodeParameter('Inputmode', i);
-					
 					let endpoint = getEndpoint(resource);
 					const columnsData = this.getNodeParameter('Columns', i) as IDataObject;
-
-
-					if(resource === Resource.Pipelines){
-						const stage = (columnsData.value as IDataObject)?.Stage as string;
-						const subPipeline = (columnsData.value as IDataObject)?.Sub_Pipeline as string;		
-				 		const availableStages = await getStages.call(this,subPipeline)
-						this.logger.debug(availableStages.toString())
-						const allowedStageValues = availableStages.map((s) => s.value);
-						if (!allowedStageValues.includes(stage)) {
-							throw new NodeOperationError(
-								this.getNode(),
-								`Invalid Stage "${stage}" for Sub_Pipeline "${subPipeline}".`,
-								{
-									description: `Available stages: ${allowedStageValues.join(' | ')}`,
-								},
-							);
-						}
-					}
-
 					const MultipicklistWrapper = this.getNodeParameter('Multipicklist', i, {}) as IDataObject;
-
 					const multiPicklistItems = (MultipicklistWrapper.Property || []) as Array<{ Field: string; Value: string[] }>;
-
 					const multiPicklistData: IDataObject = {};
-
 					for (const item of multiPicklistItems) {
 						if (item.Field) {
 							multiPicklistData[item.Field] = item.Value;
 						}
 					}
-					
-					const body= {
-						...((columnsData.value || {}) as IDataObject),
-						...multiPicklistData
-					};
-					const method = operation === Operation.Patch ? Methods.PATCH : Methods.PUT
 
+					this.logger.debug(`Operation: ${operation}, Inputmode: ${Inputmode}`);
+					const glitchyValues = Object.values(GlitchyField) as string[];
+					if (operation === Operation.Patch) {
+						// ... (Patch logic remains the same)
+						this.logger.debug('Processing Patch operation');
 
+						const body: IDataObject = {
+							...((columnsData.value || {}) as IDataObject),
+							...multiPicklistData
+						};
 
-					if (Inputmode === InputModes.Single) {
-						const recordParam = this.getNodeParameter('Recordid', i) as IdLocator
-						let recordId = recordParam.value;
+						if (Inputmode === InputModes.Single) {
+							const recordParam = this.getNodeParameter('Recordid', i) as IdLocator;
+							let recordId = recordParam.value;
+							if (recordParam.mode === 'url') {
+								recordId = extractId(resource, recordParam);
+							}
+							endpoint = `${endpoint}/${recordId}`;
 
-						if(recordParam.mode=== 'url'){
-							recordId=extractId(resource,recordParam)
+							responseData = await zohoApiRequest.call(this, Methods.PATCH, endpoint, body);
+						} else if (Inputmode === InputModes.Many) {
+							const recordsListRaw = this.getNodeParameter('Recordlist', i);
+							if (!Array.isArray(recordsListRaw)) {
+								throw new Error(`Invalid input for 'Recordlist' parameter. Expected an array.`);
+							}
+							if (recordsListRaw.length === 0) {
+								throw new Error(`The 'Recordlist' parameter is empty.`);
+							}
+
+							const patchData = recordsListRaw.map(record => {
+								let recordObj: IDataObject = {};
+									if (typeof record === 'string') {
+										recordObj = { id: record };
+									} else {
+										recordObj = Object.fromEntries(
+											Object.entries(record as IDataObject).filter(
+												([key]) => !glitchyValues.includes(key)
+											)
+										);
+									}		
+								return { ...recordObj, ...body };
+							});
+
+							responseData = await zohoApiBatchedRequest.call(this, Methods.PATCH, endpoint, patchData);
 						}
-						endpoint = endpoint+`/${recordId}`;
+					} 
+					else if (operation === Operation.Update) {
+						this.logger.debug('Processing Update operation');
 
-						
-						responseData = await zohoApiRequest.call(
-							this,
-							method,
-							endpoint,
-							body, 
-						);
-						
-					}
-					else if (Inputmode === InputModes.Many) {
-						// ----------------------------------------
-						// 				Patch (batch)
-						// ----------------------------------------
-						
-						const recordsListRaw = this.getNodeParameter('Recordlist', i) as Array<string | { id: string }>;
-			
-						const patchData = recordsListRaw.map(record => {
-		
-							const recordObj = typeof record === 'string' ? { id: record } : { ...record };
+						const writableFields = await getSearchableFields.call(this, resource);
 
-							return {
-								...recordObj,   
-								...body,
+						if (Inputmode === InputModes.Single) {
+							const body: IDataObject = {
+								...((columnsData.value || {}) as IDataObject),
+								...multiPicklistData
 							};
-						});
 
-						const response = await zohoApiBatchedRequest.call(
-							this,
-							method,
-							endpoint,
-							patchData,
-						);
-						
-						responseData = response;
+							const selectedFields = new Set([
+								...Object.keys((columnsData.value || {}) as IDataObject),
+								...Object.keys(multiPicklistData)
+							]);
+
+							for (const field of writableFields) {
+								if (!selectedFields.has(field.api_name) && 
+									!field.read_only && 
+									!field.system_mandatory &&
+									!Object.values(GlitchyField).includes(field.api_name)
+									) {
+									body[field.api_name] = getDefaultValue(field.data_type as BiginDataTypes, field.api_name);
+								}
+							}
+
+							const recordParam = this.getNodeParameter('Recordid', i) as IdLocator;
+							let recordId = recordParam.value;
+							if (recordParam.mode === 'url') {
+								recordId = extractId(resource, recordParam);
+							}
+							endpoint = `${endpoint}/${recordId}`;
+
+							responseData = await zohoApiRequest.call(this, Methods.PUT, endpoint, body);
+						} 
+						else if (Inputmode === InputModes.Many) {
+							const recordsListRaw = this.getNodeParameter('Recordlist', i);
+							if (!Array.isArray(recordsListRaw)) {
+								throw new Error(`Invalid input for 'Recordlist'.`);
+							}
+
+							const updateData = recordsListRaw.map((record) => {
+								let recordObj: IDataObject = {};
+											if (typeof record === 'string') {
+												recordObj = { id: record };
+											} else {
+												recordObj = Object.fromEntries(
+													Object.entries(record as IDataObject).filter(
+														([key]) => !glitchyValues.includes(key)
+													)
+												);
+											}
+
+								const body: IDataObject = {
+									...recordObj,
+									...((columnsData.value || {}) as IDataObject),
+									...multiPicklistData
+								};
+
+								const selectedFields = new Set([
+									...Object.keys(recordObj).filter(key => key !== 'id'),
+									...Object.keys((columnsData.value || {}) as IDataObject),
+									...Object.keys(multiPicklistData)
+								]);
+
+								for (const field of writableFields) {
+									if (!selectedFields.has(field.api_name) && 
+										!field.read_only && 
+										!field.system_mandatory &&
+										!Object.values(GlitchyField).includes(field.api_name)
+)
+										{
+										body[field.api_name] = getDefaultValue(field.data_type as BiginDataTypes, field.api_name);
+									}
+								}
+								return body;
+							});
+
+							responseData = await zohoApiBatchedRequest.call(this, Methods.PUT, endpoint, updateData);
+						}
 					}
+					
 				}
-	
 				else if (operation === Operation.Upsert) {
 					// ----------------------------------------
 					//            Account & Contacts: upsert

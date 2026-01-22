@@ -27,7 +27,8 @@ export const makeBiginFields = (): INodeProperties => {
             },
 			loadOptionsDependsOn: [
 				'resource',
-				'operation'
+				'operation',
+				'Inputmode',
 			],
         },
         displayOptions: {
@@ -636,7 +637,7 @@ export const makeGetModuleDeals = (resource: Resource): INodeProperties[] => {
 					operation: ['Getmoduledeals'],
 				},
 				hide:{
-					['Selectallfields']: [false],
+					['Selectallfields']: [true],
 				}
 			},
 			default: [],
@@ -693,7 +694,7 @@ export const makeGetModuleCalls = (resource: Resource): INodeProperties[] => {
 					operation: ['Getmodulecalls'],
 				},
 				hide:{
-					['Selectallfields']: [false],
+					['Selectallfields']: [true],
 				}
 			},
 			default: [],
@@ -708,10 +709,11 @@ export const makeGetModuleCalls = (resource: Resource): INodeProperties[] => {
 export const makeRecordsListInput = (resource: Resource): INodeProperties[] => {
     return [
         {
-            displayName: 'Records List (JSON)',
+            displayName: `${resource} List (JSON)`,
             name: 'Recordlist',
             type: 'string',
             default: '',
+			placeholder:'{{ $json.data }} or any list, use Aggregate node',
             description: 'Paste a JSON array of records. Example: [ { "ID": "123", "Account_Name": "New Name" } ].',
             displayOptions: {
                 show: {
