@@ -1069,6 +1069,8 @@ export async function getFieldMetadata(
 const TEXT_LIKE_OPERATORS: readonly COQLOperators[] = [
   'equals',
   '!=',
+  'like',
+  'not like',
   'starts with',
   'ends with',
   'in',

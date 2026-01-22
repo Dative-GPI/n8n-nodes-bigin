@@ -348,10 +348,14 @@ export const myLoadOptions: { [key: string]: (this: ILoadOptionsFunctions) => Pr
 
                 const operators = getOperatorsForType( fieldmetadata.data_type)
 
-                return operators.map((op) => ({
-                    name: op,
-                    value: op,
-                }));
+                const capitalizeWords = (str: string): string => {
+                        return str.replace(/\b\w/g, (char) => char.toUpperCase());
+                    };
+
+                    return operators.map((op) => ({
+                        name: capitalizeWords(op.replace(/_/g, ' ')), // Replace underscores with spaces and capitalize
+                        value: op,
+                    }));
             },
 
 
