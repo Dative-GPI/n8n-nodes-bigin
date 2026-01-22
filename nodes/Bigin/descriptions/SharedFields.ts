@@ -591,24 +591,8 @@ export const makeInputModeResourceLocator = (resource : Resource,operation:Opera
 
 export const makeGetModuleDeals = (resource: Resource): INodeProperties[] => {
 	return [
-		{
-			displayName: `${resource} ID`,
-			name: 'Recordid',
-			description: `ID of the ${resource} to retrieve deals for`,
-			type: 'string',
-			required: true,
-			default: '',
-			displayOptions: {
-				show: {
-					resource: [resource],
-					operation: ['Getmoduledeals'],
-				},
-				hide: {
-					Inputmode: ['Many'],
-				},
-			},
-		},
 
+		...makeResourceLocator(resource,[Operation.GetModuleDeals]),
 		{
 			displayName: 'Select All Fields',
 			name: 'Selectallfields',
@@ -648,24 +632,8 @@ export const makeGetModuleDeals = (resource: Resource): INodeProperties[] => {
 
 export const makeGetModuleCalls = (resource: Resource): INodeProperties[] => {
 	return [
-		{
-			displayName: `${resource} ID`,
-			name: 'Recordid',
-			description: `ID of the ${resource} to retrieve calls for`,
-			type: 'string',
-			required: true,
-			default: '',
-			displayOptions: {
-				show: {
-					resource: [resource],
-					operation: ['Getmodulecalls'],
-				},
-				hide: {
-					Inputmode: ['Many'],
-				},
-			},
-		},
 
+		...makeResourceLocator(resource,[Operation.GetModuleCalls]),
 		{
 			displayName: 'Select All Fields',
 			name: 'Selectallfields',

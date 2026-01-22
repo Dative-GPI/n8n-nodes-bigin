@@ -180,7 +180,7 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 	
 				else if (operation === Operation.Get) {
 
-					const recordParam = this.getNodeParameter('Recordid', i) as  IdLocator
+
 
 					const selectAll = this.getNodeParameter('Selectallfields', i) as boolean;
 					let fields: string;
@@ -194,6 +194,7 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					const qs: IDataObject = {
 						fields: fields,
 					};
+					const recordParam = this.getNodeParameter('Recordid', i) as  IdLocator
 					let recordId = recordParam.value;
 					if(recordParam.mode=== 'url'){
 						recordId=extractId(resource,recordParam)
@@ -494,23 +495,27 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 				// ----------------------------------------
 
 				this.logger.debug('--- Get Module Deals ---');
-					const recordId = this.getNodeParameter('Recordid', i) as string;
-					let endpoint = getEndpoint(resource);
-					endpoint = `${endpoint}/${recordId}${ModuleEndpoints.RelatedDeals}`;
-					let fields: string;
-					const selectAll = this.getNodeParameter('Selectallfields', i) as boolean;
-					if(selectAll){
-						fields= await getFieldsAsString.call(this, resource)	;
-					}
-					else{
-						const fieldList = this.getNodeParameter('Selectfields', i) as string[];
-						fields = fieldList.join(',');
-					}
-					const queryString: IDataObject = {
-						fields: fields,
-					};
-					const response = await zohoApiRequest.call(this, Methods.GET, endpoint, {}, queryString);
-					responseData = response;	
+				const recordParam = this.getNodeParameter('Recordid', i) as  IdLocator
+				let recordId = recordParam.value;
+				if(recordParam.mode=== 'url'){
+					recordId=extractId(resource,recordParam)
+				}
+				let endpoint = getEndpoint(resource);
+				endpoint = `${endpoint}/${recordId}${ModuleEndpoints.RelatedDeals}`;
+				let fields: string;
+				const selectAll = this.getNodeParameter('Selectallfields', i) as boolean;
+				if(selectAll){
+					fields= await getFieldsAsString.call(this, resource)	;
+				}
+				else{
+					const fieldList = this.getNodeParameter('Selectfields', i) as string[];
+					fields = fieldList.join(',');
+				}
+				const queryString: IDataObject = {
+					fields: fields,
+				};
+				const response = await zohoApiRequest.call(this, Methods.GET, endpoint, {}, queryString);
+				responseData = response.data;	
 				
 			}
 
@@ -519,8 +524,11 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 				//         Calls: getModuleCalls
 				// ----------------------------------------
 				this.logger.debug('--- Get Module Calls ---');
-				const recordId = this.getNodeParameter('Recordid', i) as string;
-
+				const recordParam = this.getNodeParameter('Recordid', i) as  IdLocator
+				let recordId = recordParam.value;
+				if(recordParam.mode=== 'url'){
+					recordId=extractId(resource,recordParam)
+				}
 				let endpoint = getEndpoint(resource);
 				endpoint = `${endpoint}/${recordId}${ModuleEndpoints.RelatedCalls}`;
 					let fields: string;
@@ -536,7 +544,7 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					fields: fields,
 				};
 				const response = await zohoApiRequest.call(this, Methods.GET, endpoint, {}, queryString);
-				responseData = response;	
+				responseData = response.data;	
 			}			
 			else if(operation === Operation.GetFields) {
 				// ----------------------------------------
