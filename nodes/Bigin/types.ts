@@ -619,6 +619,7 @@ export type PipelineLayout = {
 				display_value: string;
 				actual_value: string;
 				sequence_number: number;
+        reference_value: string;
 				maps?: Array<{
 					api_name: string;
 					id: string;

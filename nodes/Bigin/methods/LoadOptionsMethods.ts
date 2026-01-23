@@ -120,7 +120,7 @@ export const myLoadOptions: { [key: string]: (this: ILoadOptionsFunctions) => Pr
            async getSubPipelines(this: ILoadOptionsFunctions): Promise<{ name: string; value: string }[]> {
                 return (await getSubPipelines.call(this)).map(p =>({
                     name: p.display_value,
-                    value : p.display_value
+                    value : p.actual_value
                 }));
             },
 

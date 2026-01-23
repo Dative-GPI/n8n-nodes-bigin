@@ -39,7 +39,7 @@ import {
   BiginDataTypes,
   BannedFields,
   LoadedPipelineLayouts,
-  PipelineLayout,
+  
   IdLocator,
 } from '../types';
 import { isBiginDataType } from './ResourceMappingMethods';
@@ -973,22 +973,23 @@ export function filterFilterableFields(fields: BiginFieldMetadata[]): BiginField
               )) as LoadedPipelineLayouts;
               
               if (!responseData.layouts?.length) return [];
+
               
-              const matchingLayouts = responseData.layouts.filter((layout: PipelineLayout) => {
-                  return layout.profiles?.some(
-                      (profile) => profile._default_assignment_view?.name === subPipelineName
-                  );
-              });
-              
-              const stagePickListOptions = matchingLayouts
+              const SubPipelineLayouts = responseData.layouts
                   .flatMap(layout => layout.sections)
                   .flatMap(section => section.fields)
                   .filter(field => field.api_name === 'Sub_Pipeline')
+
+              this.logger.debug(`SubPipelineLayouts ${SubPipelineLayouts}`,)
+              const stagePickListOptions= SubPipelineLayouts
                   .flatMap(field => field.pick_list_values || [])
                   .filter(pickValue => pickValue.display_value === subPipelineName)
                   .flatMap(pickValue => pickValue.maps || [])
                   .flatMap(map => map.pick_list_values || []);
               
+
+                this.logger.debug(`stagePickListOptions ${stagePickListOptions}`,)
+
               let stages = stagePickListOptions.map(o => ({
                   name: o.display_value,
                   value: o.actual_value,
@@ -1005,37 +1006,36 @@ export function filterFilterableFields(fields: BiginFieldMetadata[]): BiginField
       }
 
       export async function getSubPipelines(this: ILoadOptionsFunctions | IExecuteFunctions): Promise<{ display_value: string; actual_value: string }[]> {             
+          const response = await zohoApiRequest.call(
+              this, 
+              Methods.GET, 
+              ModuleEndpoints.Layouts, 
+              {}, 
+              { module: Resource.Pipelines }
+          ) as LoadedPipelineLayouts;
 
-        const endpoint = ModuleEndpoints.Layouts;
-				const queryString: IDataObject = {
-					module: Resource.Pipelines
-				};
-				const response = await zohoApiRequest.call(this, Methods.GET, endpoint, {}, queryString) as LoadedPipelineLayouts;
-				
-				if (!response.layouts?.length) {
-					return [];
-				} else {
-					const subPipelineOptions = response.layouts
-						.flatMap(layout => layout.sections)
-						.flatMap(section => section.fields)
-						.filter(field => field.pick_list_values && field.pick_list_values.length > 0)
-						.flatMap(field => field.pick_list_values!)
-						.filter(pickList => pickList.maps && pickList.maps.length > 0)
-						.map(pickList => ({
-							id: pickList.actual_value,
-							name: pickList.display_value
-						}));
-					
+          if (!response.layouts?.length) {
+              return [];
+          }
 
-					const uniqueMap = new Map();
-					subPipelineOptions.forEach(item => uniqueMap.set(item.id, item));
-					
+          const subPipelineOptions = response.layouts
+              .flatMap((layout) => layout.sections)
+              .flatMap((section) => section.fields)
+              .filter((field) => field.pick_list_values && field.pick_list_values.length > 0)
+              .flatMap((field) => field.pick_list_values!)
+              .filter((pickList) => pickList.maps && pickList.maps.length > 0);
 
-					return Array.from(uniqueMap.values()).map(item => ({
-						display_value: item.name,
-            actual_value: item.id,
-					}));
-				}
+          const uniqueMap = new Map(
+              subPipelineOptions.map((pickList) => [
+                  pickList.actual_value,
+                  {
+                      display_value: pickList.display_value,
+                      actual_value: pickList.reference_value,
+                  }
+              ])
+          );
+
+          return Array.from(uniqueMap.values());
       }
 
 
