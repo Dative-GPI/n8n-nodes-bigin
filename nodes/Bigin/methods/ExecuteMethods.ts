@@ -143,6 +143,10 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					const customFieldsWrapper = this.getNodeParameter('Multipicklist', i, {}) as IDataObject;
 					const multiPicklistItems = (customFieldsWrapper.property || []) as Array<{ field: string; value: string[] }>;
 
+					const Subpipelinename = this.getNodeParameter('Subpipelinenamew', i, {}) as string;
+					const Stage = this.getNodeParameter('Stage', i, {}) as string;
+
+
 					const multiPicklistData: IDataObject = {};
 
 					for (const item of multiPicklistItems) {
@@ -150,11 +154,12 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 							multiPicklistData[item.field] = item.value;
 						}
 					}
-				
 					
 					const body = {
 						...((columnsData.value || {}) as IDataObject),
-						...multiPicklistData
+						...multiPicklistData,
+						...({ Sub_Pipeline: Subpipelinename }),
+        				...({ Stage: Stage })
 					};
 					
 					responseData = await zohoApiRequest.call(
@@ -179,9 +184,6 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 				}
 	
 				else if (operation === Operation.Get) {
-
-
-
 					const selectAll = this.getNodeParameter('Selectallfields', i) as boolean;
 					let fields: string;
 					if(selectAll){
@@ -246,7 +248,6 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					this.logger.debug(`Operation: ${operation}, Inputmode: ${Inputmode}`);
 					const glitchyValues = Object.values(GlitchyField) as string[];
 					if (operation === Operation.Patch) {
-						// ... (Patch logic remains the same)
 						this.logger.debug('Processing Patch operation');
 
 						const body: IDataObject = {
@@ -255,6 +256,11 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 						};
 
 						if (Inputmode === InputModes.Single) {
+							const Subpipelinename = this.getNodeParameter('Subpipelinenamero', i, '') as string;
+							const Stage = this.getNodeParameter('Stage', i, '') as string;
+							
+							if (Subpipelinename) body.Sub_Pipeline = Subpipelinename;
+							if (Stage) body.Stage = Stage;
 							const recordParam = this.getNodeParameter('Recordid', i) as IdLocator;
 							let recordId = recordParam.value;
 							if (recordParam.mode === 'url') {
@@ -299,6 +305,12 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 								...((columnsData.value || {}) as IDataObject),
 								...multiPicklistData
 							};
+
+							const Subpipelinename = this.getNodeParameter('Subpipelinenamero', i, '') as string;
+							const Stage = this.getNodeParameter('Stage', i, '') as string;
+							
+							if (Subpipelinename) body.Sub_Pipeline = Subpipelinename;
+							if (Stage) body.Stage = Stage;
 
 							const selectedFields = new Set([
 								...Object.keys((columnsData.value || {}) as IDataObject),
@@ -394,6 +406,12 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 						...((columnsData.value || {}) as IDataObject),
 						...multiPicklistData
 					};	
+
+					const Subpipelinename = this.getNodeParameter('Subpipelinenamew', i, '') as string;
+					const Stage = this.getNodeParameter('Stage', i, '') as string;
+					
+					if (Subpipelinename) recordData.Sub_Pipeline = Subpipelinename;
+					if (Stage) recordData.Stage = Stage;
 
 					
 					const duplicateCheckFields = (await getRequiredFieldsMetadata.call(this,resource)).map(f => f.api_name)

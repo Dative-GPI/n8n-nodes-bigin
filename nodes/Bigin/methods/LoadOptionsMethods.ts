@@ -1,6 +1,6 @@
 import { IDataObject, ILoadOptionsFunctions, INodePropertyOptions } from "n8n-workflow";
-import { allAccountFields, BiginDataTypes, LoadedAccounts, LoadedContacts, LoadedPipelineLayouts, LoadedProducts, Methods, ModuleEndpoints, Resource } from "../types";
-import { getFieldMetadata, getFields, getFieldsAsString, getFieldsMetadata, getFilterableFields, getOperatorsForType, getPicklistValues, getSearchableFields, getSortableFields, getStages, getSubPipelines, mapMetadataToOptions, toLoadOptions, zohoApiRequest, zohoApiRequestAllItemsBatch, zohoApiRequestAllItemsBatchReturnAll } from "./GenericFunctions";
+import { allAccountFields, BiginDataTypes,  IdLocator,  LoadedAccounts, LoadedContacts, LoadedPipelineLayouts, LoadedProducts, Methods, ModuleEndpoints, Operation, Resource } from "../types";
+import { extractId, getDealSubPipeline, getFieldMetadata, getFields, getFieldsAsString, getFieldsMetadata, getFilterableFields, getOperatorsForType, getPicklistValues, getSearchableFields, getSortableFields, getStages, getSubPipelines, mapMetadataToOptions, toLoadOptions, zohoApiRequest, zohoApiRequestAllItemsBatch, zohoApiRequestAllItemsBatchReturnAll } from "./GenericFunctions";
 
 
 export const myLoadOptions: { [key: string]: (this: ILoadOptionsFunctions) => Promise<INodePropertyOptions[]> } = {
@@ -118,21 +118,90 @@ export const myLoadOptions: { [key: string]: (this: ILoadOptionsFunctions) => Pr
             },
 
            async getSubPipelines(this: ILoadOptionsFunctions): Promise<{ name: string; value: string }[]> {
-                return (await getSubPipelines.call(this)).map(p =>({
-                    name: p.display_value,
-                    value : p.actual_value
-                }));
+
+                    return (await getSubPipelines.call(this)).map(p =>({
+                            name: p.display_value,
+                            value : p.actual_value
+                        }));
             },
 
 
+async getRecordSubPipeline(
+	this: ILoadOptionsFunctions
+): Promise<Array<{ name: string; value: string }>> {
+
+	this.logger.debug('getRecordSubPipeline: start');
+
+	const recordParam = this.getNodeParameter('Recordid') as IdLocator;
+	const resource = this.getNodeParameter('resource') as string;
+
+	this.logger.debug('getRecordSubPipeline: recordParam', {
+		recordParam,
+		resource,
+	});
+
+	let recordId = recordParam.value;
+	if (recordParam.mode === 'url') {
+		recordId = extractId(resource, recordParam);
+
+		this.logger.debug('getRecordSubPipeline: extracted recordId from URL', {
+			recordId,
+		});
+	} else {
+		this.logger.debug('getRecordSubPipeline: recordId from value', {
+			recordId,
+		});
+	}
+
+	const subPipeline = await getDealSubPipeline.call(this, recordId);
+
+	this.logger.debug('getRecordSubPipeline: subPipeline received', {
+		subPipeline,
+	});
+
+	return [
+		{
+			name: subPipeline,
+			value: subPipeline,
+		},
+	];
+},
+
+
+            
+
+
             async getStages(this: ILoadOptionsFunctions): Promise<{ name: string; value: string }[]> {
-                const subPipelineName = this.getNodeParameter('Subpipelinename') as string;                              
-                const stages = await getStages.call(this,subPipelineName)
-                const displayStages = stages.map(s => ({
-                    name: s.name,
-                    value: s.name,
-                }));
-                return displayStages;
+                const operation =  this.getNodeParameter('operation') as string; 
+                if(operation === Operation.Create || operation === Operation.Upsert){
+                    const subPipelineName = this.getNodeParameter('Subpipelinenamew') as string;                              
+                    const stages = await getStages.call(this,subPipelineName)
+                    const displayStages = stages.map(s => ({
+                        name: s.name,
+                        value: s.name,
+                    }));
+                    return displayStages;
+                }
+                else {
+                    const recordParam = this.getNodeParameter('Recordid') as IdLocator;
+                    const resource = this.getNodeParameter('resource') as string;
+
+                    let recordId = recordParam.value;
+                    if (recordParam.mode === 'url') {
+                        recordId = extractId(resource, recordParam);
+                    }
+                    
+                    const Sub_Pipeline= await getDealSubPipeline.call(this,recordId)
+
+                    const stages = await getStages.call(this,Sub_Pipeline)
+
+                    return stages.map(s => ({
+                        name: s.name,
+                        value: s.name,
+                    }))
+                }
+
+
             },
 
             // ----------------------------------------

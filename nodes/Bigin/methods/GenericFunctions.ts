@@ -1039,6 +1039,35 @@ export function filterFilterableFields(fields: BiginFieldMetadata[]): BiginField
       }
 
 
+export async function getDealSubPipeline(
+	this: ILoadOptionsFunctions | IExecuteFunctions,
+	dealId: string
+): Promise<string> {
+
+	this.logger.debug('getDealSubPipeline: start', {
+		dealId,
+	});
+
+	const deal = await zohoApiRequest.call(
+		this,
+		Methods.GET,
+		`${ModuleEndpoints.Pipelines}/${dealId}`
+	) as any;
+
+	this.logger.debug('getDealSubPipeline: API response received', {
+		deal,
+	});
+
+	const dealPipeline = deal.Sub_Pipeline;
+
+	this.logger.debug('getDealSubPipeline: extracted Sub_Pipeline', {
+		dealPipeline,
+	});
+
+	return dealPipeline;
+}
+
+
 export async function getRequiredFieldsMetadata(
 	this: ILoadOptionsFunctions | IExecuteFunctions,
 	module: Resource,

@@ -1,7 +1,7 @@
 import { type ILoadOptionsFunctions, type ResourceMapperFields, type FieldType, type ResourceMapperField } from 'n8n-workflow';
 
 
-import { BiginDataTypes, Resource, InputModes, Operation } from '../types';
+import { BiginDataTypes, Resource, InputModes, Operation, PipelineFields } from '../types';
 import {  getFieldsMetadata, getPicklistValues } from './GenericFunctions';
 
 const fieldTypeMapping: Partial<Record<FieldType, BiginDataTypes[]>> = {
@@ -71,11 +71,7 @@ export const getMappingColumns = async function(
 			Inputmode = InputModes.Single
 			break
 		case Operation.Upsert:
-			Inputmode = this.getNodeParameter('Inputmode') as string;
-				break;
 		case Operation.Update:
-			Inputmode = this.getNodeParameter('Inputmode') as string;
-			break;
 		case Operation.Patch:
 			Inputmode = this.getNodeParameter('Inputmode') as string;
 			break;
@@ -84,7 +80,7 @@ export const getMappingColumns = async function(
 	this.logger.debug(`Inputmode: ${Inputmode}`)
 	const fields = await Promise.all(
 		fieldMetadata
-			.filter((col) => isBiginDataType(col.data_type) )
+			.filter((col) => isBiginDataType(col.data_type) && col.api_name != PipelineFields.Stage && col.api_name != PipelineFields.Pipeline && col.api_name)//handled manually and can't update a deal out of its Pipeline
 			.map(async (col) => {
 				const options =
 					(col.data_type === BiginDataTypes.picklist || col.data_type === BiginDataTypes.multiselectpicklist)

@@ -33,7 +33,7 @@ export const makeBiginFields = (): INodeProperties => {
         },
         displayOptions: {
             show: {
-                resource: ['Contacts', 'Accounts','Products','Calls','Events','Tasks'],
+                resource: ['Contacts', 'Accounts','Products','Calls','Events','Tasks','Pipelines'],
 				operation: ['Upsert', 'Create', 'Update', 'Patch'],
             },
         },

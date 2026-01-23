@@ -8,7 +8,10 @@ import {
 	makeGetMany,
 	makeGetPicklistValues,
 	makeInputMode,
+	makePatch,
 	makeRecordsListInput,
+	makeUpdate,
+	makeUpsert,
 } from './SharedFields';
 
 //Buggy api for write operations
@@ -31,18 +34,18 @@ export const pipelineOperations: INodeProperties[] = [
                     'action': 'Count amount of deals'
 
 			},
-			// {
-			// 	'name': 'Create',
-			// 	'value': 'Create',
-			// 	'description': 'Create a deal',
-			// 	'action': 'Create a deal'
-			// },
-			// {
-			// 	'name': 'Create Or Update',
-			// 	'value': 'Upsert',
-			// 	'description': 'Create a new record, or update the current one if it already exists (upsert)',
-			// 	'action': 'Create or update a deal'
-			// },
+			{
+				'name': 'Create',
+				'value': 'Create',
+				'description': 'Create a deal',
+				'action': 'Create a deal'
+			},
+			{
+				'name': 'Create Or Update',
+				'value': 'Upsert',
+				'description': 'Create a new record, or update the current one if it already exists (upsert)',
+				'action': 'Create or update a deal'
+			},
 			{
 				'name': 'Delete',
 				'value': 'Delete',
@@ -97,29 +100,29 @@ export const pipelineOperations: INodeProperties[] = [
 				'description': 'Obtain all Stages of a Sub Pipeline',
 				'action': 'Get all stages of a sub pipeline'
 			},
-			// {
-			// 	'name': 'Update all fields',
-			// 	'value': 'Update',
-			// 	'description': 'Update a deal',
-			// 	'action': 'Update a deal'
-			// },
-			// {
-			// 	'name': 'Update Specific Fields',
-			// 	'value': 'Patch',
-			// 	'description': 'Update specific fields of a deal',
-			// 	'action': 'Patch a deal'
-			// }
+			{
+				'name': 'Update all fields',
+				'value': 'Update',
+				'description': 'Update a deal',
+				'action': 'Update a deal'
+			},
+			{
+				'name': 'Update Specific Fields',
+				'value': 'Patch',
+				'description': 'Update specific fields of a deal',
+				'action': 'Patch a deal'
+			}
 		],
 		default: 'Create',
 	},
 ];
 
-export const pipelineFields: INodeProperties[] = [
 
-	...makeInputMode('Pipelines'),
+const makePipelineFields = (): INodeProperties[] => {
+	return [
 		{
-			displayName: `Sub Pipeline Name`,
-			name: 'Subpipelinename',
+			displayName: 'Sub Pipeline Name or ID',
+			name: 'Subpipelinenamew',
 			description: 'Name of the sub pipeline. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 			placeholder: '',
 			type: 'options',
@@ -131,15 +134,72 @@ export const pipelineFields: INodeProperties[] = [
 			displayOptions: {
 				show: {
 					resource: ['Pipelines'],
-					operation: ['Getstages'],
+					operation: ['Getstages','Create'],
+					Inputmode: ['Single']
 				},
 			},
 		},
-		//Disabled because of api issues
-	//...makeUpsert('Pipelines'),
 
-	//...makeUpdate('Pipelines'),
-	//...makePatch('Pipelines'),
+//Stage and Sub pipeline depend on the current deal position. We stop the user from modifying the sub pipeline
+		{
+			displayName: 'Sub Pipeline Name or ID',
+			name: 'Subpipelinenamero',
+			description: 'Name of the sub pipeline. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+			placeholder: '',
+			type: 'options',
+			required: true,
+			default: '',
+			typeOptions:{
+				loadOptionsMethod: 'getRecordSubPipeline',
+				loadOptionsDependsOn: ['Recordid']
+			},		
+			displayOptions: {
+				show: {
+					resource: ['Pipelines'],
+					operation: ['Patch','Update'],
+					Inputmode: ['Single']
+				},
+			},
+		},
+		
+
+		{
+			displayName: 'Stage Name or ID',
+			name: 'Stage',
+			description: 'Name of the sub pipeline. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+			placeholder: '',
+			type: 'options',
+			required: true,
+			default: '',
+			typeOptions:{
+				loadOptionsMethod: 'getStages',
+				loadOptionsDependsOn: ['Subpipelinenamero','Subpipelinenamew']
+			},		
+			displayOptions: {
+				show: {
+					resource: ['Pipelines'],
+					operation: ['Create','Patch','Update','Upsert'],
+					Inputmode: ['Single']
+				},
+			},
+		},
+
+		
+
+	]
+
+}
+
+export const pipelineFields: INodeProperties[] = [
+
+	...makeInputMode('Pipelines'),
+		//Disabled because of api issues
+	...makeUpsert('Pipelines'),
+
+	...makeUpdate('Pipelines'),
+	...makePatch('Pipelines'),
+
+	...makePipelineFields(),
 	...makeRecordsListInput('Pipelines'),
 
 	...makeGetPicklistValues('Pipelines'),
@@ -150,3 +210,4 @@ export const pipelineFields: INodeProperties[] = [
 
     ...makeGetAll('Pipelines'),
 ];
+
