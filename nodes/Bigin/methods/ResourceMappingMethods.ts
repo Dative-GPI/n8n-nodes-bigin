@@ -80,7 +80,7 @@ export const getMappingColumns = async function(
 	this.logger.debug(`Inputmode: ${Inputmode}`)
 	const fields = await Promise.all(
 		fieldMetadata
-			.filter((col) => isBiginDataType(col.data_type) && col.api_name != PipelineFields.Stage && col.api_name != PipelineFields.Pipeline && col.api_name)//handled manually and can't update a deal out of its Pipeline
+			.filter((col) => isBiginDataType(col.data_type) && col.api_name != PipelineFields.Stage && col.api_name != PipelineFields.Pipeline && col.api_name !==PipelineFields.Sub_Pipeline)//handled manually and can't update a deal out of its Pipeline
 			.map(async (col) => {
 				const options =
 					(col.data_type === BiginDataTypes.picklist || col.data_type === BiginDataTypes.multiselectpicklist)

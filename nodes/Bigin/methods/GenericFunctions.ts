@@ -68,8 +68,8 @@ export async function zohoApiRequest(
 
 	this.logger.debug("oauthTokenData:" + oauthTokenData);
 	this.logger.debug("Api_domain:" +oauthTokenData.api_domain );
-	this.logger.debug("Body:"+ body);
-	this.logger.debug("QS:"+ qs);
+	this.logger.debug("Body:", body);
+	this.logger.debug("QS:", qs);
 	this.logger.debug("method: "+method, );
   this.logger.debug("Endpoint:" + endpoint);
 
@@ -1095,6 +1095,7 @@ export async function getFieldMetadata(
 
 
 
+
 const TEXT_LIKE_OPERATORS: readonly COQLOperators[] = [
   'equals',
   '!=',
@@ -1153,11 +1154,17 @@ export const OPERATORS_BY_BIGIN_TYPE_GROUPS: Array<{
       BiginDataTypes.textarea,
       BiginDataTypes.profileimage,
       BiginDataTypes.multiselectpicklist,
+      BiginDataTypes.lookup,
+      BiginDataTypes.userlookup,
     ],
     operators: TEXT_LIKE_OPERATORS,
   },
   {
     types: [
+      BiginDataTypes.datetime,
+      BiginDataTypes.date,
+      BiginDataTypes.long_str,
+      BiginDataTypes.double_str,
       BiginDataTypes.integer,
       BiginDataTypes.currency,
       BiginDataTypes.decimal,

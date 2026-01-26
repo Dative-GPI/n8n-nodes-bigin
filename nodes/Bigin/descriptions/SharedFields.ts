@@ -241,7 +241,7 @@ export const makeUpsert = (resource: Resource): INodeProperties[] => {
 			displayName: `Similar ${resource} are based on required fields`,
 			name:'Upsertnotice',
 			type: 'notice',
-			default: 'Similar ${resource} are basedd on required fields',
+			default: 'Similar ${resource} are based on required fields',
 			displayOptions:{
 				show: {
 					operation: ['Upsert'],

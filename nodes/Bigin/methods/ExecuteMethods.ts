@@ -144,7 +144,7 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					const multiPicklistItems = (customFieldsWrapper.property || []) as Array<{ field: string; value: string[] }>;
 
 					const Subpipelinename = this.getNodeParameter('Subpipelinenamew', i, {}) as string;
-					const Stage = this.getNodeParameter('Stage', i, {}) as string;
+					const Stage = this.getNodeParameter('Stagecreate', i, {}) as string;
 
 
 					const multiPicklistData: IDataObject = {};
@@ -503,7 +503,7 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 				// ----------------------------------------
 				//         Pipelines: getStages
 				// ----------------------------------------
-				const subPipelineName = this.getNodeParameter('Subpipelinename', i) as string;
+				const subPipelineName = this.getNodeParameter('Subpipelinenamew', i) as string;
 				responseData =  await getStages.call(this,subPipelineName);
 			}
 

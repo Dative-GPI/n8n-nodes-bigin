@@ -59,7 +59,7 @@ export const pipelineOperations: INodeProperties[] = [
 				'action': 'Get a deal'
 			},
 			{
-				'name': 'GetAll',
+				'name': 'Get All',
 				'value': 'Getall',
 				'description': 'Get all deals',
 				'action': 'Get all deals'
@@ -101,7 +101,7 @@ export const pipelineOperations: INodeProperties[] = [
 				'action': 'Get all stages of a sub pipeline'
 			},
 			{
-				'name': 'Update all fields',
+				'name': 'Update All fields',
 				'value': 'Update',
 				'description': 'Update a deal',
 				'action': 'Update a deal'
@@ -135,7 +135,6 @@ const makePipelineFields = (): INodeProperties[] => {
 				show: {
 					resource: ['Pipelines'],
 					operation: ['Getstages','Create'],
-					Inputmode: ['Single']
 				},
 			},
 		},
@@ -165,7 +164,7 @@ const makePipelineFields = (): INodeProperties[] => {
 
 		{
 			displayName: 'Stage Name or ID',
-			name: 'Stage',
+			name: 'Stagecreate',
 			description: 'Name of the sub pipeline. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 			placeholder: '',
 			type: 'options',
@@ -179,10 +178,31 @@ const makePipelineFields = (): INodeProperties[] => {
 				show: {
 					resource: ['Pipelines'],
 					operation: ['Create','Patch','Update','Upsert'],
+				},
+			},
+		},
+
+		{
+			displayName: 'Stage Name or ID',
+			name: 'Stage',
+			description: 'Name of the sub pipeline. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+			placeholder: '',
+			type: 'options',
+			required: true,
+			default: '',
+			typeOptions:{
+				loadOptionsMethod: 'getStages',
+				loadOptionsDependsOn: ['Subpipelinenamero','Subpipelinenamew']
+			},		
+			displayOptions: {
+				show: {
+					resource: ['Pipelines'],
+					operation: ['Patch','Update','Upsert'],
 					Inputmode: ['Single']
 				},
 			},
 		},
+
 
 		
 
