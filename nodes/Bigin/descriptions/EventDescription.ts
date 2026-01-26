@@ -76,7 +76,7 @@ export const eventOperations: INodeProperties[] = [
             }
         ],
 
-        default: 'Create',
+        default: 'Get',
     },
 ];
 

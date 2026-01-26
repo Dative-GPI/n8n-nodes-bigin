@@ -110,7 +110,7 @@ export const pipelineOperations: INodeProperties[] = [
 			// 	'action': 'Patch a deal'
 			// }
 		],
-		default: 'Create',
+		default: 'Get',
 	},
 ];
 

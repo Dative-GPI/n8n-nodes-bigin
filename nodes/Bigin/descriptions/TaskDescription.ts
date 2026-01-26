@@ -75,7 +75,7 @@ export const taskOperations: INodeProperties[] = [
                 action: 'Update specific fields of a task',
             },
         ],
-        default: 'Create',
+        default: 'Get',
     },
 ];
 

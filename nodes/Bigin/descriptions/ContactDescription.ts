@@ -109,7 +109,7 @@ export const contactOperations: INodeProperties[] = [
 			}
 		],
 
-		default: 'Create',
+		default: 'Get',
 	},
 ];
 

@@ -82,7 +82,7 @@ export const productOperations: INodeProperties[] = [
 			},
 					
 		],
-		default: 'Create',
+		default: 'Get',
 	},
 ];
 

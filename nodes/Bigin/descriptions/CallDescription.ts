@@ -10,7 +10,7 @@ export const callsOperations: INodeProperties[] = [
         name: 'operation',
         type: 'options',
         noDataExpression: true,
-        default: 'Create',
+        default: 'Get',
         options: [
             {
                 'name': 'Create',
