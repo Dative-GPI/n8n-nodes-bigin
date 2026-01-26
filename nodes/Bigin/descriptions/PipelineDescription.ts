@@ -8,10 +8,7 @@ import {
 	makeGetMany,
 	makeGetPicklistValues,
 	makeInputMode,
-	makePatch,
 	makeRecordsListInput,
-	makeUpdate,
-	makeUpsert,
 } from './SharedFields';
 
 //Buggy api for write operations
@@ -34,18 +31,18 @@ export const pipelineOperations: INodeProperties[] = [
                     'action': 'Count amount of deals'
 
 			},
-			{
-				'name': 'Create',
-				'value': 'Create',
-				'description': 'Create a deal',
-				'action': 'Create a deal'
-			},
-			{
-				'name': 'Create Or Update',
-				'value': 'Upsert',
-				'description': 'Create a new record, or update the current one if it already exists (upsert)',
-				'action': 'Create or update a deal'
-			},
+			// {
+			// 	'name': 'Create',
+			// 	'value': 'Create',
+			// 	'description': 'Create a deal',
+			// 	'action': 'Create a deal'
+			// },
+			// {
+			// 	'name': 'Create Or Update',
+			// 	'value': 'Upsert',
+			// 	'description': 'Create a new record, or update the current one if it already exists (upsert)',
+			// 	'action': 'Create or update a deal'
+			// },
 			{
 				'name': 'Delete',
 				'value': 'Delete',
@@ -100,18 +97,18 @@ export const pipelineOperations: INodeProperties[] = [
 				'description': 'Obtain all Stages of a Sub Pipeline',
 				'action': 'Get all stages of a sub pipeline'
 			},
-			{
-				'name': 'Update All fields',
-				'value': 'Update',
-				'description': 'Update a deal',
-				'action': 'Update a deal'
-			},
-			{
-				'name': 'Update Specific Fields',
-				'value': 'Patch',
-				'description': 'Update specific fields of a deal',
-				'action': 'Patch a deal'
-			}
+			// {
+			// 	'name': 'Update All Fields',
+			// 	'value': 'Update',
+			// 	'description': 'Update a deal',
+			// 	'action': 'Update a deal'
+			// },
+			// {
+			// 	'name': 'Update Specific Fields',
+			// 	'value': 'Patch',
+			// 	'description': 'Update specific fields of a deal',
+			// 	'action': 'Patch a deal'
+			// }
 		],
 		default: 'Create',
 	},
@@ -214,11 +211,11 @@ export const pipelineFields: INodeProperties[] = [
 
 	...makeInputMode('Pipelines'),
 		//Disabled because of api issues
-	...makeUpsert('Pipelines'),
+	//...makeUpsert('Pipelines'),
 
-	...makeUpdate('Pipelines'),
-	...makePatch('Pipelines'),
-
+	//...makeUpdate('Pipelines'),
+	//...makePatch('Pipelines'),
+//
 	...makePipelineFields(),
 	...makeRecordsListInput('Pipelines'),
 

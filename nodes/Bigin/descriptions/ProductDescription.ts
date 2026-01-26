@@ -69,7 +69,7 @@ export const productOperations: INodeProperties[] = [
 				'action': 'Get the values of a picklist'
 			},
 			{
-				'name': 'Update All fields',
+				'name': 'Update All Fields',
 				'value': 'Update',
 				'description': 'Update a product',
 				'action': 'Update a product'
