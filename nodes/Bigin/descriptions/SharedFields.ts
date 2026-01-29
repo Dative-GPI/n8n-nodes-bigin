@@ -1,7 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
 
-import {  Operation, Resource } from '../types';
+import {  MAX_FIELDS, Operation, Resource } from '../types';
 
 export const makeBiginFields = (): INodeProperties => {
     return {
@@ -116,6 +116,24 @@ export const makeMultiPickListFields = (): INodeProperties => {
 };
 
 
+export const makeMaxFieldsNotice=(resource: Resource,operations: Operation[]): INodeProperties[] =>{
+
+	return [
+		{
+			displayName: `Up to ${MAX_FIELDS} fields are allowed by Bigin, skipping any additional ones`,
+			name: 'Maxfields',
+			type: 'notice',
+			default:`Up to ${MAX_FIELDS} fields are allowed by Bigin, skipping any additional ones`,
+			displayOptions:{
+				show:{
+					resource: [resource],
+					operation: operations,
+				}
+			}
+		},
+	]
+}
+
 export const makeGetPicklistValues=(resource: Resource): INodeProperties[] =>{
 	return [
 		{
@@ -143,7 +161,10 @@ export const makeGetPicklistValues=(resource: Resource): INodeProperties[] =>{
 
 
 export const makeGetAll = (resource: Resource): INodeProperties[] => {
-	return makeGetAllFields(resource,['Getall'])
+	return [
+		...makeGetAllFields(resource,[Operation.GetAll]),
+		...makeMaxFieldsNotice(resource,[Operation.GetAll]),
+	]
 };
 
 export const makeGetFields = (resource: Resource, operations: Operation[]= []): INodeProperties[] => {
@@ -218,7 +239,7 @@ export const makeGetAllFields = (resource: Resource, operations: Operation[]= []
 				},
 			},
 		},
-		...makeGetFields(resource,operations)
+		...makeGetFields(resource,operations),
 	];
 };
 
@@ -447,8 +468,10 @@ export const makeDelete = (resource: Resource): INodeProperties[] => {
 
 export const makeGet = (resource: Resource): INodeProperties[] => {
 	return [
-			...makeGetFields(resource,['Get']),
-			...makeResourceLocator(resource,['Get'])
+			...makeGetFields(resource,[Operation.Get]),
+			...makeMaxFieldsNotice(resource,[Operation.Get]),
+			...makeResourceLocator(resource,[Operation.Get]),
+
 	];
 };
 

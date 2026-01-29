@@ -2,7 +2,7 @@
 	"node": "n8n-nodes-bigin.bigin",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
-	"categories": ["Communication", "Sales", "CRM"],
+	"categories": ["Communication", "Sales","Data & Storage"],
 	"resources": {
 		"credentialDocumentation": [
 			{
@@ -11,7 +11,7 @@
 		],
 		"primaryDocumentation": [
 			{
-				"url": "https://github.com/your-repo/n8n-nodes-bigin#readme" 
+				"url": "https://github.com/Dative-GPI/n8n-nodes-bigin#readme" 
 			}
 		],
 		"generic": [
@@ -23,7 +23,7 @@
 			{
 				"label": "Bigin API Documentation",
 				"icon": "code",
-				"url": "https://www.zoho.com/bigin/developer/api/v2/"
+				"url": "https://www.bigin.com/developer/docs/apis/v2/"
 			}
 		]
 	}
