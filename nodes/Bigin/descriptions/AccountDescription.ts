@@ -66,7 +66,7 @@ export const accountOperations: INodeProperties[] = [
 			},
 			{
 				'name': 'Get Company Calls',
-				'value': 'GetmoduleCalls',
+				'value': 'Getmodulecalls',
 				'description': 'Get all calls linked to a company',
 				'action': 'Get all calls linked to a company'
 			},

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IDataObject, IExecuteFunctions, INodeExecutionData } from "n8n-workflow";
-import { Resource,  getEndpoint,  InputModes, LoadedPipelineLayouts, Methods, ModuleEndpoints, Operation, OrderByClause, IdLocator, BiginDataTypes, GlitchyField} from "../types";
+import { Resource,  getEndpoint,  InputModes, LoadedPipelineLayouts, Methods, ModuleEndpoints, Operation, OrderByClause, IdLocator, BiginDataTypes, GlitchyField, MAX_FIELDS} from "../types";
 import { buildCoqlQuery, buildWhereConditions, extractId, filterSearchableFields, getDefaultValue, getFields,  getFieldsAsString, getFieldsMetadata, getPicklistValues, getRequiredFieldsMetadata, getSearchableFields, getStages, getSubPipelines, mapMetadataToOptions, zohoApiBatchedRequest, zohoApiCoqlRequest, zohoApiRequest, zohoApiRequestAllItemsBatch } from "./GenericFunctions";
 
 
@@ -191,7 +191,7 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					}
 					else{
 						const fieldList = this.getNodeParameter('Selectfields', i) as string[];
-						fields = fieldList.join(',');
+						fields = fieldList.slice(0,MAX_FIELDS).join(',');
 					}
 					const qs: IDataObject = {
 						fields: fields,
@@ -221,7 +221,7 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					}
 					else{
 						const fieldList = this.getNodeParameter('Selectfields', i) as string[];
-						fields = fieldList.join(',');
+						fields = fieldList.slice(0,MAX_FIELDS).join(',');
 					}
 				
 					const endpoint = getEndpoint(resource);

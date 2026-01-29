@@ -15,9 +15,6 @@ import { accountFields, accountOperations, callsFields, callsOperations, contact
 import { makeBiginFields, makeMultiPickListFields } from './descriptions/SharedFields';
 
 
-
-
-
 export class Bigin implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Bigin',

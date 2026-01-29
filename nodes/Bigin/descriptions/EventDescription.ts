@@ -84,6 +84,7 @@ export const eventFields: INodeProperties[] = [
         ...makeInputMode('Events'),
     
         ...makeUpdate('Events'),
+        
         ...makePatch('Events'),
 
         ...makeRecordsListInput('Events'),
@@ -95,7 +96,6 @@ export const eventFields: INodeProperties[] = [
         ...makeGet('Events'),
     
         ...makeGetMany('Events'),
-    
     
         ...makeGetAll('Events'),
 ];

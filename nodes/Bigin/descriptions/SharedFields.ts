@@ -475,7 +475,7 @@ export const makeResourceLocator = (resource : Resource,operation:Operation[]): 
 				type: 'resourceLocator',
 				default: '',
 				typeOptions: {
-					loadOptionsDependsOn: ['resource']
+					loadOptionsDependsOn: ['resource','operation']
 				},
 				required: true,
 				modes: [

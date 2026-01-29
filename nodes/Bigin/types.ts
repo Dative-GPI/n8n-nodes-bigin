@@ -65,6 +65,10 @@ export const Resource = {
 
 export const DefaultModule: string = Resource.Accounts;
 
+
+
+
+
 export type Resource = typeof Resource[keyof typeof Resource];
 
 
@@ -99,6 +103,8 @@ export const ResourceEndpointMap: Partial<Record<Resource, ModuleEndpoints>> = {
 export const getEndpoint = (resource: Resource): string => {
   return ResourceEndpointMap[resource]?.toString() ?? '';
 };
+
+export const MAX_FIELDS= 50;
 
 export const Methods = {
   GET: 'GET',

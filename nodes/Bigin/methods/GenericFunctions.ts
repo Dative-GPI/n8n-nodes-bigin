@@ -41,6 +41,7 @@ import {
   LoadedPipelineLayouts,
   
   IdLocator,
+  MAX_FIELDS,
 } from '../types';
 import { isBiginDataType } from './ResourceMappingMethods';
 
@@ -1210,7 +1211,7 @@ export async function getFieldsAsString(
 	{ onlyCustom } = { onlyCustom: false },
 ): Promise<string> {
 	const options = await getFields.call(this, module, { onlyCustom });
-	return options.map((o) => o.value).join(',');
+	return options.slice(0,MAX_FIELDS).map((o) => o.value).join(',');
 }
 
 
