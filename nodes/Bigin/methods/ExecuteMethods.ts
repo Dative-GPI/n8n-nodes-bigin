@@ -256,11 +256,6 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 						};
 
 						if (Inputmode === InputModes.Single) {
-							const Subpipelinename = this.getNodeParameter('Subpipelinenamero', i, '') as string;
-							const Stage = this.getNodeParameter('Stage', i, '') as string;
-							
-							if (Subpipelinename) body.Sub_Pipeline = Subpipelinename;
-							if (Stage) body.Stage = Stage;
 							const recordParam = this.getNodeParameter('Recordid', i) as IdLocator;
 							let recordId = recordParam.value;
 							if (recordParam.mode === 'url') {
@@ -305,12 +300,6 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 								...((columnsData.value || {}) as IDataObject),
 								...multiPicklistData
 							};
-
-							const Subpipelinename = this.getNodeParameter('Subpipelinenamero', i, '') as string;
-							const Stage = this.getNodeParameter('Stage', i, '') as string;
-							
-							if (Subpipelinename) body.Sub_Pipeline = Subpipelinename;
-							if (Stage) body.Stage = Stage;
 
 							const selectedFields = new Set([
 								...Object.keys((columnsData.value || {}) as IDataObject),
@@ -406,13 +395,6 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 						...((columnsData.value || {}) as IDataObject),
 						...multiPicklistData
 					};	
-
-					const Subpipelinename = this.getNodeParameter('Subpipelinenamew', i, '') as string;
-					const Stage = this.getNodeParameter('Stage', i, '') as string;
-					
-					if (Subpipelinename) recordData.Sub_Pipeline = Subpipelinename;
-					if (Stage) recordData.Stage = Stage;
-
 					
 					const duplicateCheckFields = (await getRequiredFieldsMetadata.call(this,resource)).map(f => f.api_name)
 					this.logger.debug("Duplicate check fields:"+duplicateCheckFields)

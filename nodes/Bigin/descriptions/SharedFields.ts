@@ -20,7 +20,7 @@ export const makeBiginFields = (): INodeProperties => {
                     singular: 'column',
                     plural: 'columns',
                 },
-				allowEmptyValues:true, //important
+				allowEmptyValues:true, 
                 addAllFields: false, 
                 multiKeyMatch: true,
                 supportAutoMap: false,
