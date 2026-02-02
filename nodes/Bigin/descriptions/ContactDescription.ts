@@ -105,7 +105,7 @@ export const contactOperations: INodeProperties[] = [
 				'name': 'Update Specific Fields',
 				'value': 'Patch',
 				'description': 'Update specific fields of a contact',
-				'action': 'Patch a contact'
+				'action': 'Update specific fields of a contact'
 			}
 		],
 
