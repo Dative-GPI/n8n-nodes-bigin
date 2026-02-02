@@ -82,7 +82,7 @@ export const eventOperations: INodeProperties[] = [
 
 export const eventFields: INodeProperties[] = [
         ...makeInputMode('Events'),
-    
+      ...makeInputMode('Events'),
         ...makeUpdate('Events'),
         
         ...makePatch('Events'),
