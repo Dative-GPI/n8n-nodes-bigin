@@ -1,5 +1,3 @@
-/* eslint-disable n8n-nodes-base/node-param-default-wrong-for-options */
-
 import type { INodeProperties } from 'n8n-workflow';
 import {  makeDelete, makeGet, makeGetAll, makeGetMany, makeGetPicklistValues, makeInputMode,  makeRecordsListInput} from './SharedFields';
 
@@ -13,48 +11,65 @@ export const callsOperations: INodeProperties[] = [
         default: 'Get',
         options: [
             {
-                'name': 'Create',
-                'value': 'Create',
-                'description': 'Create a call',
-                'action': 'Create a call'
+                name: 'Create',
+                value: 'Create',
+                description: 'Create a call',
+                action: 'Create a call'
             },
             {
-                'name': 'Delete',
-                'value': 'Delete',
-                'description': 'Delete a call',
-                'action': 'Delete a call'
+                name: 'Delete',
+                value: 'Delete',
+                description: 'Delete a call',
+                action: 'Delete a call'
             },
             {
-                'name': 'Get',
-                'value': 'Get',
-                'description': 'Get a call',
-                'action': 'Get a call'
+                name: 'Get',
+                value: 'Get',
+                description: 'Get a call',
+                action: 'Get a call'
             },
             {
-                'name': 'Get All',
-                'value': 'Getall',
-                'description': 'Get all calls',
-                'action': 'Get all calls'
+                name: 'Get All',
+                value: 'Getall',
+                description: 'Get all calls',
+                action: 'Get all calls'
             },
             {
-                'name': 'Get Many',
-                'value': 'Getmany',
-                'description': 'Get many calls',
-                'action': 'Get many calls'
+                name: 'Get Fields',
+                value: 'Getfields',
+                description: 'Get the fields of calls',
+                action: 'Get fields of calls'
             },
             {
-                'name': 'Get Fields',
-                'value': 'Getfields',
-                'description': 'Get the fields of calls',
-                'action': 'Get fields of calls'
+                name: 'Get Many',
+                value: 'Getmany',
+                description: 'Get many calls',
+                action: 'Get many calls'
             },
             {
-                'name': 'Get PickList Values',
-                'value': 'Getpicklistvalues',
-                'description': 'Get the values of a picklist',
-                'action': 'Get the values of a picklist'
+                name: 'Get PickList Values',
+                value: 'Getpicklistvalues',
+                description: 'Get the values of a picklist',
+                action: 'Get the values of a picklist'
             },
-
+			{
+				name: 'Tags Add',
+				value: 'Updatetags',
+				description: 'Add available tags to a call',
+				action: 'Add available tags to a call'
+			},
+			{
+				name: 'Tags Create',
+				value: 'Createtags',
+				description: 'Create new call tags',
+				action: 'Create new call tags'
+			},
+			{
+				name: 'Tags Get',
+				value: 'Gettags',
+				description: 'Get calls tags',
+				action: 'Get calls tags'
+			},
         ],
 
         displayOptions: {

@@ -50,9 +50,8 @@ export const getManyCoql = async function (
 	// ----------------------------------------
 	const whereGroup = this.getNodeParameter('Where', i) as IDataObject;
 	const rawConditions = (whereGroup.Condition as IDataObject[]) || [];
-
-	// eslint-disable-next-line prefer-const
-	let { conditions, logic} = buildWhereConditions(rawConditions);
+	this.logger.debug("Conditions")
+	let conditions= buildWhereConditions.call(this,rawConditions);
 
 	if (conditions.length === 0 && defaultFieldOptions.length > 0) {
 		const defaultField = defaultFieldOptions[0].value;
@@ -96,7 +95,6 @@ export const getManyCoql = async function (
 		resource,
 		selectFields,
 		conditions,
-		logic,
 		orderByClause,
 		limit,
 		offset,
@@ -201,11 +199,17 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					if(recordParam.mode=== 'url'){
 						recordId=extractId(resource,recordParam)
 					}
-
-
 					const endpoint = getEndpoint(resource)+`/${recordId}`;
 					responseData = await zohoApiRequest.call(this, Methods.GET, endpoint,{},qs);
 					responseData= responseData.data
+				}
+				else if(operation === Operation.GetTags){
+					const qs: IDataObject = {
+						module: resource,
+					};
+					const endpoint = ModuleEndpoints.Tags;
+					responseData = await zohoApiRequest.call(this, Methods.GET, endpoint,{},qs);
+					responseData= responseData.tags
 				}
 
 				else if (operation === Operation.GetMany) {

@@ -3,6 +3,7 @@ export const BiginCoqlInLimit = 50;
 export const BiginCoqlOffsetLimit = 10000;
 
 export const OperationName = { 
+  AddTag: 'Add Tag',
   Create: 'Create',
   Delete: 'Delete',
   Get: 'Get',
@@ -18,7 +19,8 @@ export const OperationName = {
   GetModuleDeals: 'Get Record Deals',
   GetModuleCalls: 'Get Record Calls',
   GetFields: 'Get Fields',
-  GetPickListValues: 'Get PickList Values'
+  GetPickListValues: 'Get PickList Values',
+  GetTags: 'Get Tags',
 }as const;
 
 export type OperationName = typeof OperationName[keyof typeof OperationName];
@@ -37,9 +39,12 @@ export const Operation = {
   GetPipelines: 'Getpipelines',
   GetStages: 'Getstages',
   GetSubPipelines: 'Getsubpipelines',
+  GetTags: 'Gettags',
+  AddTags: 'Addtags',
   Patch: 'Patch',
   Update: 'Update',
   Upsert: 'Upsert',
+
 }as const;
 
 export type Operation = typeof Operation[keyof typeof Operation];
@@ -83,6 +88,7 @@ export const ModuleEndpoints = {
   Coql: '/coql',
   Layouts: '/settings/layouts',
   Fields: '/settings/fields',
+  Tags: '/settings/tags',
   RecordCount: '/actions/count',
   RelatedCalls: '/All_Calls',
   RelatedDeals: '/Deals',
@@ -468,11 +474,11 @@ export interface WhereCondition {
   field: string;
   operator: Operator;
   value: string | string[] | number | boolean | null;
+  logic?: SearchLogic; 
 }
 
 export interface WhereClause {
   conditions: WhereCondition[];
-  logic?: SearchLogic; 
 }
 
 

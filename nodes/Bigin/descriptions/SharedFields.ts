@@ -273,6 +273,25 @@ export const makeUpsert = (resource: Resource): INodeProperties[] => {
 	]
 }
 
+
+export const makeAddTags = (resource: Resource): INodeProperties[] => {
+	return [
+		{
+			displayName: '',
+			name: '',
+			type: 'string',
+			default: undefined,
+			displayOptions:{
+				show:{
+					resource:[resource],
+					operation:['Addtags'],
+				}
+			}
+		}
+	]
+}
+
+
 export const makeSearchFilter = (resource: Resource): INodeProperties[] => {
 
 	return [

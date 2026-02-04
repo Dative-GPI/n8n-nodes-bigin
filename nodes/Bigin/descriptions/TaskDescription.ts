@@ -62,6 +62,24 @@ export const taskOperations: INodeProperties[] = [
                 description: 'Get the values of a picklist',
                 action: 'Get the values of a picklist',
             },
+			{
+				name: 'Tags Add',
+				value: 'Updatetags',
+				description: 'Add available tags to a task',
+				action: 'Add available tags to a task'
+			},
+			{
+				name: 'Tags Create',
+				value: 'Createtags',
+				description: 'Create new task tags',
+				action: 'Create new task tags'
+			},
+			{
+				name: 'Tags Get',
+				value: 'Gettags',
+				description: 'Get tasks tags',
+				action: 'Get tasks tags'
+			},
             {
                 name: 'Update All Fields',
                 value: 'Update',

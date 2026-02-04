@@ -66,11 +66,10 @@ export async function zohoApiRequest(
 ) {
 	const { oauthTokenData } = await this.getCredentials<BiginOAuth2ApiCredentials>(BiginCredentialName);
 
-
 	this.logger.debug("oauthTokenData:" + oauthTokenData);
 	this.logger.debug("Api_domain:" +oauthTokenData.api_domain );
-	this.logger.debug("Body:", body);
-	this.logger.debug("QS:", qs);
+	this.logger.debug("Body:", body as IDataObject);
+	this.logger.debug("QS:", qs as IDataObject);
 	this.logger.debug("method: "+method, );
   this.logger.debug("Endpoint:" + endpoint);
 
@@ -86,7 +85,7 @@ export async function zohoApiRequest(
 		url: `${oauthTokenData.api_domain}/bigin/v2${endpoint}`,
 		json: true,
 	};
-	this.logger.debug("Url:"+options.url );
+	this.logger.debug("Url:"+options.url);
 
 
 
@@ -160,8 +159,8 @@ export async function zohoApiBatchedRequest(
                 results.push(responseData);
             }
         } catch (error) {
-			this.logger.debug("Error in batch request:", error);
-            const args = error.cause?.data
+          this.logger.debug("Error in batch request: " + (error as Error).message);       
+          const args = error.cause?.data
                 ? {
                       message: error.cause.data.message || 'The Zoho API returned an error.',
                       description: JSON.stringify(error.cause.data, null, 2),
@@ -190,8 +189,9 @@ export async function zohoApiRequestAllItemsBatch(
     if (!returnAll) {
         limit = this.getNodeParameter('Limit', 0) as number;
     }
-
+    qs.per_page = (limit > 0 && limit < 200) ? limit : 200;
     let nextPageToken = null;
+
     let responseData;
 
     do {
@@ -325,36 +325,31 @@ export interface BuildCoqlQueryParams {
 }
 
 export function buildCoqlQuery(
-	resource: Resource,
-	selectFields: string[],
-	whereConditions: WhereCondition[],
-	whereLogic?: SearchLogic,
-	orderBy?: OrderByClause[],
-	limit?: number,
-	offset?: number,
+  resource: Resource,
+  selectFields: string[],
+  whereConditions: WhereCondition[],
+  orderBy?: OrderByClause[],
+  limit?: number,
+  offset?: number,
 ): COQLQuery {
+  const selectClause: SelectClause = {
+    fields: selectFields,
+    allFields: false,
+  };
 
-	const selectClause: SelectClause = {
-		fields: selectFields,
-		allFields: false,
-	};
+  const whereClause: WhereClause | undefined = 
+    whereConditions.length > 0 
+      ? { conditions: whereConditions }
+      : undefined;
 
-	const whereClause: WhereClause = {
-		conditions: whereConditions,
-	};
-
-	if (whereLogic) {
-		whereClause.logic = whereLogic;
-	}
-
-	return {
-		select: selectClause,
-		from: resource.toString(),
-		where: whereClause,
-		orderBy: orderBy && orderBy.length > 0 ? orderBy : undefined,
-		limit,
-		offset,
-	};
+  return {
+    select: selectClause,
+    from: resource.toString(),
+    where: whereClause,
+    orderBy: orderBy && orderBy.length > 0 ? orderBy : undefined,
+    limit,
+    offset,
+  };
 }
 
 
@@ -370,7 +365,7 @@ export function extractId(resource : Resource,recordParam: IdLocator): string{
 }
 
 export async function searchModule(
-	this: ILoadOptionsFunctions,
+	this: ILoadOptionsFunctions | IExecuteFunctions,
 	resource: Resource,
 	searchField: string,
   outputFields: string[],
@@ -381,19 +376,20 @@ export async function searchModule(
 this.logger.debug("searchField: "+searchField)
 this.logger.debug("filter: "+filter)
 
-	const { conditions } = buildWhereConditions([
+	const conditions  = buildWhereConditions.call(this,[
 		{
 			Field: searchField,
 			Operator: 'like',
 			Value: filter,
-		},
-	]);
+      Logic: 'OR'
+		}
+	]
+);
 
 	const coqlQuery = buildCoqlQuery(
 		resource,                                // resource
 		['id',searchField],                      // selectFields
 		conditions,                              // whereConditions
-		undefined,                               // whereLogic
 		undefined,                               // orderBy
 		20,                                      // limit
 		paginationToken ? Number(paginationToken) : 0, // offset
@@ -447,15 +443,18 @@ function buildOrderByClause(orderBy: OrderByClause[]): string {
 
 
 export function buildWhereConditions(
+  this: IExecuteFunctions |ILoadOptionsFunctions,
 	whereConditions: IDataObject[],
-): { conditions: WhereCondition[]; logic?: SearchLogic } {
+): WhereCondition[] {
+      this.logger.debug("in buildWhereConditions")
 
-	const validConditions = whereConditions
+	return whereConditions
 		.map((c: IDataObject) => {
 			const field = c.Field as string;
 			let operator = c.Operator as string;
 			const value = c.Value;
-
+      const logic = c.Logic as SearchLogic
+      this.logger.debug("LOGIC: "+logic)
 			if (!field || !operator) return null;
 
 			if (operator === 'equals') {
@@ -517,27 +516,16 @@ export function buildWhereConditions(
 				return { field, operator: operator as COQLOperators, value: null };
 			}
 
-			return {
-				field,
-				operator: operator as COQLOperators,
-				value: value !== undefined && value !== null ? String(value) : null,
-			};
+      return {
+        field,
+        operator: operator as COQLOperators,
+        value: value !== undefined && value !== null ? String(value) : null,
+        logic,
+      };
 		})
 		.filter(Boolean) as WhereCondition[];
 
-	let logic: SearchLogic | undefined;
-
-	if (whereConditions.length > 1) {
-		logic =
-			whereConditions[0].logic === 'OR'
-				? 'OR'
-				: 'AND';
-	}
-
-	return { conditions: validConditions, logic };
 }
-
-
 
 
 function buildWhereClause(where: WhereClause): string {
@@ -545,54 +533,52 @@ function buildWhereClause(where: WhereClause): string {
     return '';
   }
 
-  const logic = where.logic || 'AND';
-  const conditions = where.conditions.map(condition => {
+  const parts: string[] = [];
+
+  for (let i = 0; i < where.conditions.length; i++) {
+    const condition = where.conditions[i];
     const { field, operator, value } = condition;
+
+    // Build the condition string
+    let conditionStr: string;
     switch (operator) {
       case 'is null':
       case 'is not null':
-        return `(${field} ${operator})`;
+        conditionStr = `(${field} ${operator})`;
+        break;
       case 'in':
       case 'not in':
         if (!Array.isArray(value) || value.length === 0) {
           throw new Error(`Value for ${operator} must be a non-empty array`);
         }
-        return `(${field} ${operator} ('${value.join("','")}'))`;
-      //case 'between':
-      // case 'not between':
-      //   if (!Array.isArray(value) || value.length !== 2) {
-      //     throw new Error(`Value for ${operator} must be an array of two elements`);
-      //   }
-      //   return `(${field} ${operator} '${value[0]}' AND '${value[1]}')`;
+        conditionStr = `(${field} ${operator} ('${value.join("','")}'))`;
+        break;
       case 'like':
       case 'not like':
         if (value === null) {
           throw new Error(`Value for ${operator} cannot be null`);
         }
-        return `(${field} ${operator} '${value}' )`;
+        conditionStr = `(${field} ${operator} '${value}')`;
+        break;
       default:
         if (value === null) {
           throw new Error(`Value for ${operator} cannot be null`);
         }
-        return `(${field} ${operator} '${value}')`;
+        conditionStr = `(${field} ${operator} '${value}')`;
+        break;
     }
-  });
 
-  // Regrouper les conditions par paires de 2, avec des parenthèses autour de chaque paire
-  const groupedConditions: string[] = [];
-  for (let i = 0; i < conditions.length; i += 2) {
-    if (i + 1 < conditions.length) {
-      // Si une paire existe, regrouper les deux conditions
-      groupedConditions.push(`(${conditions[i]} ${logic} ${conditions[i + 1]})`);
-    } else {
-      // Sinon, ajouter la condition seule avec des parenthèses
-      groupedConditions.push(`(${conditions[i]})`);
+
+    parts.push(conditionStr);
+
+    if (i < where.conditions.length - 1) {
+      const logic = condition.logic || 'AND';
+      parts.push(logic);
     }
   }
 
-  return `${COQLCommands.WHERE} ${groupedConditions.join(` ${logic} `)}`;
+  return `${COQLCommands.WHERE} ${parts.join(' ')}`;
 }
-
 
 function buildLimitClause(limit: number): string {
   return `${COQLCommands.LIMIT} ${limit}`;
@@ -699,7 +685,6 @@ async function handleInOperatorQueries(
             ? { ...condition, value: chunk }
             : condition
         ),
-        logic: query.where?.logic,
       };
 
       let chunkFetched = 0;

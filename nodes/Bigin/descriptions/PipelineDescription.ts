@@ -1,4 +1,3 @@
-/* eslint-disable n8n-nodes-base/node-param-default-wrong-for-options */
 import type { INodeProperties } from 'n8n-workflow';
 
 import {
@@ -25,89 +24,106 @@ export const pipelineOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				'name': 'Count',
-				'value': 'Count',
-				'description': 'Get the total number of deals',
-                    'action': 'Count amount of deals'
+				name: 'Count',
+				value: 'Count',
+				description: 'Get the total number of deals',
+                    action: 'Count amount of deals'
 
 			},
 			// {
-			// 	'name': 'Create',
-			// 	'value': 'Create',
-			// 	'description': 'Create a deal',
-			// 	'action': 'Create a deal'
+			// 	name: 'Create',
+			// 	value: 'Create',
+			// 	description: 'Create a deal',
+			// 	action: 'Create a deal'
 			// },
 			// {
-			// 	'name': 'Create Or Update',
-			// 	'value': 'Upsert',
-			// 	'description': 'Create a new record, or update the current one if it already exists (upsert)',
-			// 	'action': 'Create or update a deal'
+			// 	name: 'Create Or Update',
+			// 	value: 'Upsert',
+			// 	description: 'Create a new record, or update the current one if it already exists (upsert)',
+			// 	action: 'Create or update a deal'
 			// },
 			{
-				'name': 'Delete',
-				'value': 'Delete',
-				'description': 'Delete a deal',
-				'action': 'Delete a deal'
+				name: 'Delete',
+				value: 'Delete',
+				description: 'Delete a deal',
+				action: 'Delete a deal'
 			},
 			{
-				'name': 'Get',
-				'value': 'Get',
-				'description': 'Get a deal',
-				'action': 'Get a deal'
+				name: 'Get',
+				value: 'Get',
+				description: 'Get a deal',
+				action: 'Get a deal'
 			},
 			{
-				'name': 'Get All',
-				'value': 'Getall',
-				'description': 'Get all deals',
-				'action': 'Get all deals'
+				name: 'Get All',
+				value: 'Getall',
+				description: 'Get all deals',
+				action: 'Get all deals'
 			},
 			{
-				'name': 'Get Fields',
-				'value': 'Getfields',
-				'description': 'Get the fields of deals',
-				'action': 'Get fields of deals'
+				name: 'Get Fields',
+				value: 'Getfields',
+				description: 'Get the fields of deals',
+				action: 'Get fields of deals'
 			},
 			{
-				'name': 'Get Many',
-				'value': 'Getmany',
-				'description': 'Get many deals',
-				'action': 'Get many deals'
+				name: 'Get Many',
+				value: 'Getmany',
+				description: 'Get many deals',
+				action: 'Get many deals'
 			},
 			{
-				'name': 'Get PickList Values',
-				'value': 'GetpickListvalues',
-				'description': 'Get the values of a picklist',
-				'action': 'Get the values of a picklist'
+				name: 'Get PickList Values',
+				value: 'GetpickListvalues',
+				description: 'Get the values of a picklist',
+				action: 'Get the values of a picklist'
+			},
+
+			{
+				name: 'Obtain All Pipelines',
+				value: 'Getpipelines',
+				action: 'Get all pipelines'
 			},
 			{
-				'name': 'Obtain All Pipelines',
-				'value': 'Getpipelines',
-				'description': 'Obtain all Pipelines',
-				'action': 'Get all pipelines'
+				name: 'Obtain All Sub Pipelines',
+				value: 'Getsubpipelines',
+				action: 'Get all sub pipelines'
 			},
 			{
-				'name': 'Obtain All Sub Pipelines',
-				'value': 'Getsubpipelines',
-				'description': 'Obtain all Sub Pipelines',
-				'action': 'Get all sub pipelines'
+				name: 'Obtain All Sub Pipelines Stages',
+				value: 'Getstages',
+				description: 'Obtain all Stages of a Sub Pipeline',
+				action: 'Get all stages of a sub pipeline'
 			},
 			{
-				'name': 'Obtain All Sub Pipelines Stages',
-				'value': 'Getstages',
-				'description': 'Obtain all Stages of a Sub Pipeline',
-				'action': 'Get all stages of a sub pipeline'
+				name: 'Tags Add',
+				value: 'Updatetags',
+				description: 'Add available tags to a deal',
+				action: 'Add available tags to a deal'
+			},
+			{
+				name: 'Tags Create',
+				value: 'Createtags',
+				description: 'Create new deal tags',
+				action: 'Create new deal tags'
+			},
+			{
+				name: 'Tags Get',
+				value: 'Gettags',
+				description: 'Get deals tags',
+				action: 'Get deals tags'
 			},
 			// {
-			// 	'name': 'Update All Fields',
-			// 	'value': 'Update',
-			// 	'description': 'Update a deal',
-			// 	'action': 'Update a deal'
+			// 	name: 'Update All Fields',
+			// 	value: 'Update',
+			// 	description: 'Update a deal',
+			// 	action: 'Update a deal'
 			// },
 			// {
-			// 	'name': 'Update Specific Fields',
-			// 	'value': 'Patch',
-			// 	'description': 'Update specific fields of a deal',
-			// 	'action': 'Patch a deal'
+			// 	name: 'Update Specific Fields',
+			// 	value: 'Patch',
+			// 	description: 'Update specific fields of a deal',
+			// 	action: 'Patch a deal'
 			// }
 		],
 		default: 'Get',

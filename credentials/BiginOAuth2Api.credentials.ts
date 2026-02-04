@@ -1,6 +1,6 @@
 import type {  Icon, ICredentialType, INodeProperties } from 'n8n-workflow';
 
-const AdminScope = 'ZohoBigin.notifications.ALL,ZohoBigin.modules.Pipelines.READ,ZohoBigin.settings.ALL,ZohoBigin.org.ALL,ZohoBigin.settings.roles.ALL,ZohoBigin.settings.profiles.ALL,ZohoBigin.users.ALL,ZohoBigin.modules.ALL,ZohoBigin.modules.attachments.ALL,ZohoBigin.modules.Pipelines.ALL,ZohoBigin.modules.Contacts.ALL,ZohoBigin.modules.Accounts.ALL,ZohoBigin.modules.Products.ALL,ZohoBigin.modules.Tasks.ALL,ZohoBigin.modules.Events.ALL,ZohoBigin.modules.Calls.ALL,ZohoBigin.coql.READ';
+const AdminScope = 'ZohoBigin.notifications.ALL,ZohoBigin.modules.Pipelines.READ,ZohoBigin.settings.ALL,ZohoBigin.settings.tags.ALL,ZohoBigin.org.ALL,ZohoBigin.settings.roles.ALL,ZohoBigin.settings.profiles.ALL,ZohoBigin.users.ALL,ZohoBigin.modules.ALL,ZohoBigin.modules.attachments.ALL,ZohoBigin.modules.Pipelines.ALL,ZohoBigin.modules.Contacts.ALL,ZohoBigin.modules.Accounts.ALL,ZohoBigin.modules.Products.ALL,ZohoBigin.modules.Tasks.ALL,ZohoBigin.modules.Events.ALL,ZohoBigin.modules.Calls.ALL,ZohoBigin.coql.READ';
 
 export class BiginOAuth2Api implements ICredentialType {
 	name = 'biginOAuth2Api';
