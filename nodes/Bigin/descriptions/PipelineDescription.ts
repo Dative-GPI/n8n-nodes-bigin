@@ -1,7 +1,10 @@
 import type { INodeProperties } from 'n8n-workflow';
 
 import {
+	makeAddTags,
+	makeCreateTags,
 	makeDelete,
+	makeDeleteTags,
 	makeGet,
 	makeGetAll,
 	makeGetMany,
@@ -97,7 +100,7 @@ export const pipelineOperations: INodeProperties[] = [
 			},
 			{
 				name: 'Tags Add',
-				value: 'Updatetags',
+				value: 'Addtags',
 				description: 'Add available tags to a deal',
 				action: 'Add available tags to a deal'
 			},
@@ -106,6 +109,12 @@ export const pipelineOperations: INodeProperties[] = [
 				value: 'Createtags',
 				description: 'Create new deal tags',
 				action: 'Create new deal tags'
+			},
+			{
+				name: 'Tags Delete',
+				value: 'Deletetags',
+				description: 'Delete deals tag',
+				action: 'Delete deals tag'
 			},
 			{
 				name: 'Tags Get',
@@ -234,9 +243,10 @@ export const pipelineFields: INodeProperties[] = [
 //
 	...makePipelineFields(),
 	...makeRecordsListInput('Pipelines'),
-
+	...makeAddTags('Pipelines'),
+	...makeCreateTags('Pipelines'),
 	...makeGetPicklistValues('Pipelines'),
-
+        	...makeDeleteTags('Pipelines'),
 	...makeDelete('Pipelines'),
 	...makeGetMany('Pipelines'),
 	...makeGet('Pipelines'),

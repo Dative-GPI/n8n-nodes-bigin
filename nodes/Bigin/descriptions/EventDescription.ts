@@ -1,6 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-import { makeDelete, makeGet, makeGetAll, makeGetMany,  makeGetPicklistValues,  makeInputMode, makePatch, makeRecordsListInput, makeUpdate } from './SharedFields';
+import { makeAddTags, makeCreateTags, makeDelete, makeDeleteTags, makeGet, makeGetAll, makeGetMany,  makeGetPicklistValues,  makeInputMode, makePatch, makeRecordsListInput, makeUpdate } from './SharedFields';
 export const eventOperations: INodeProperties[] = [
     {
         displayName: 'Operation',
@@ -63,7 +63,7 @@ export const eventOperations: INodeProperties[] = [
             },
 			{
 				name: 'Tags Add',
-				value: 'Updatetags',
+				value: 'Addtags',
 				description: 'Add available tags to a event',
 				action: 'Add available tags to a event'
 			},
@@ -72,6 +72,12 @@ export const eventOperations: INodeProperties[] = [
 				value: 'Createtags',
 				description: 'Create new event tags',
 				action: 'Create new event tags'
+			},
+            {
+				name: 'Tags Delete',
+				value: 'Deletetags',
+				description: 'Delete events tag',
+				action: 'Delete events tag'
 			},
 			{
 				name: 'Tags Get',
@@ -109,7 +115,10 @@ export const eventFields: INodeProperties[] = [
         ...makeGetPicklistValues('Events'),
     
         ...makeDelete('Events'),
-    
+        ...makeAddTags('Events'),
+        ...makeCreateTags('Events'),
+        	...makeDeleteTags('Events'),
+
         ...makeGet('Events'),
     
         ...makeGetMany('Events'),

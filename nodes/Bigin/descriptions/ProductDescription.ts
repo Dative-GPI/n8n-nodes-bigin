@@ -1,6 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-import { makeDelete, makeGet, makeGetAll, makeGetMany,  makeGetPicklistValues,  makeInputMode, makePatch, makeRecordsListInput, makeUpdate, makeUpsert } from './SharedFields';
+import { makeAddTags, makeCreateTags, makeDelete, makeDeleteTags, makeGet, makeGetAll, makeGetMany,  makeGetPicklistValues,  makeInputMode, makePatch, makeRecordsListInput, makeUpdate, makeUpsert } from './SharedFields';
 export const productOperations: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -69,7 +69,7 @@ export const productOperations: INodeProperties[] = [
 			},
 			{
 				name: 'Tags Add',
-				value: 'Updatetags',
+				value: 'Addtags',
 				description: 'Add available tags to a product',
 				action: 'Add available tags to a product'
 			},
@@ -78,6 +78,12 @@ export const productOperations: INodeProperties[] = [
 				value: 'Createtags',
 				description: 'Create new product tags',
 				action: 'Create new product tags'
+			},
+			{
+				name: 'Tags Delete',
+				value: 'Deletetags',
+				description: 'Delete products tag',
+				action: 'Delete products tag'
 			},
 			{
 				name: 'Tags Get',
@@ -114,7 +120,9 @@ export const productFields: INodeProperties[] = [
 	...makeGetPicklistValues('Products'),
 
 	...makeDelete('Products'),
-
+	...makeAddTags('Products'),
+	...makeCreateTags('Products'),
+        	...makeDeleteTags('Products'),
 	...makeGet('Products'),
 
 	...makeGetMany('Products'),

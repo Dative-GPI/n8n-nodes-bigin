@@ -1,5 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
-import {  makeDelete, makeGet, makeGetAll, makeGetMany, makeGetPicklistValues, makeInputMode,  makeRecordsListInput} from './SharedFields';
+import {  makeAddTags, makeCreateTags, makeDelete, makeDeleteTags, makeGet, makeGetAll, makeGetMany, makeGetPicklistValues, makeInputMode,  makeRecordsListInput} from './SharedFields';
 
 
 export const callsOperations: INodeProperties[] = [
@@ -54,7 +54,7 @@ export const callsOperations: INodeProperties[] = [
             },
 			{
 				name: 'Tags Add',
-				value: 'Updatetags',
+				value: 'Addtags',
 				description: 'Add available tags to a call',
 				action: 'Add available tags to a call'
 			},
@@ -63,6 +63,12 @@ export const callsOperations: INodeProperties[] = [
 				value: 'Createtags',
 				description: 'Create new call tags',
 				action: 'Create new call tags'
+			},
+            {
+				name: 'Tags Delete',
+				value: 'Deletetags',
+				description: 'Delete calls tag',
+				action: 'Delete calls tag'
 			},
 			{
 				name: 'Tags Get',
@@ -83,20 +89,15 @@ export const callsOperations: INodeProperties[] = [
 ];
     
 export const callsFields: INodeProperties[] = [
-
-
     ...makeInputMode('Calls'),
-
-    // ...makeUpdate('Calls'),
-    // ...makePatch('Calls'),
     ...makeRecordsListInput('Calls'),
-
     ...makeGetPicklistValues('Calls'),
     ...makeDelete('Calls'),
-
+    ...makeCreateTags('Calls'),
+    ...makeAddTags('Calls'),
     ...makeGet('Calls'),
+    ...makeDeleteTags('Calls'),
 
     ...makeGetAll('Calls'),
     ...makeGetMany('Calls'),
-
 ]

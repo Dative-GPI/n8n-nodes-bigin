@@ -41,6 +41,8 @@ export const Operation = {
   GetSubPipelines: 'Getsubpipelines',
   GetTags: 'Gettags',
   AddTags: 'Addtags',
+  CreateTags: 'Createtags',
+  DeleteTags: 'Deletetags',
   Patch: 'Patch',
   Update: 'Update',
   Upsert: 'Upsert',
@@ -89,6 +91,7 @@ export const ModuleEndpoints = {
   Layouts: '/settings/layouts',
   Fields: '/settings/fields',
   Tags: '/settings/tags',
+  AddTags: '/actions/add_tags',
   RecordCount: '/actions/count',
   RelatedCalls: '/All_Calls',
   RelatedDeals: '/Deals',
@@ -504,6 +507,23 @@ export interface COQLQuery {
   offset?: number;
 }
 
+
+export type Tag = {
+    created_time: string;
+    modified_time: string;
+    name: string;
+    modified_by: {
+        name: string;
+        id: string;
+    };
+    id: string;
+    created_by: {
+        name: string;
+        id: string;
+    };
+    color_code: string | null;
+};
+export type ArrayTag = Tag[];
 
 // ----------------------------------------
 //         for resource loaders

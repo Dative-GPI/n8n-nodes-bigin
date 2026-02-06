@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IDataObject, IExecuteFunctions, INodeExecutionData } from "n8n-workflow";
 import { Resource,  getEndpoint,  InputModes, LoadedPipelineLayouts, Methods, ModuleEndpoints, Operation, OrderByClause, IdLocator, BiginDataTypes, GlitchyField, MAX_FIELDS} from "../types";
-import { buildCoqlQuery, buildWhereConditions, extractId, filterSearchableFields, getDefaultValue, getFields,  getFieldsAsString, getFieldsMetadata, getPicklistValues, getRequiredFieldsMetadata, getSearchableFields, getStages, getSubPipelines, mapMetadataToOptions, zohoApiBatchedRequest, zohoApiCoqlRequest, zohoApiRequest, zohoApiRequestAllItemsBatch } from "./GenericFunctions";
+import { buildCoqlQuery, buildWhereConditions, extractId, filterSearchableFields, getDefaultValue, getFields,  getFieldsAsString, getFieldsMetadata, getPicklistValues, getRequiredFieldsMetadata, getSearchableFields, getStages, getSubPipelines, GetTags, mapMetadataToOptions, zohoApiBatchedRequest, zohoApiCoqlRequest, zohoApiRequest, zohoApiRequestAllItemsBatch } from "./GenericFunctions";
 
 
 
@@ -141,9 +141,6 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					const customFieldsWrapper = this.getNodeParameter('Multipicklist', i, {}) as IDataObject;
 					const multiPicklistItems = (customFieldsWrapper.property || []) as Array<{ field: string; value: string[] }>;
 
-					const Subpipelinename = this.getNodeParameter('Subpipelinenamew', i, {}) as string;
-					const Stage = this.getNodeParameter('Stagecreate', i, {}) as string;
-
 
 					const multiPicklistData: IDataObject = {};
 
@@ -156,8 +153,6 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					const body = {
 						...((columnsData.value || {}) as IDataObject),
 						...multiPicklistData,
-						...({ Sub_Pipeline: Subpipelinename }),
-        				...({ Stage: Stage })
 					};
 					
 					responseData = await zohoApiRequest.call(
@@ -204,12 +199,116 @@ export const execute = async function(this: IExecuteFunctions): Promise<INodeExe
 					responseData= responseData.data
 				}
 				else if(operation === Operation.GetTags){
+					responseData= await GetTags.call(this,resource)
+				}
+				else if(operation === Operation.DeleteTags){
+					const tagId= this.getNodeParameter('Tag', i) as string;
+					const endpoint= `${ModuleEndpoints.Tags}/${tagId}`
+					responseData= await zohoApiRequest.call(this,Methods.DELETE,endpoint)
+				}
+				if (operation === Operation.CreateTags) {
+					const endpoint = ModuleEndpoints.Tags;
+					
+					this.logger.debug('CreateTags operation started', { 
+						resource: resource 
+					});
+					
 					const qs: IDataObject = {
 						module: resource,
 					};
-					const endpoint = ModuleEndpoints.Tags;
-					responseData = await zohoApiRequest.call(this, Methods.GET, endpoint,{},qs);
-					responseData= responseData.tags
+					const Tag = this.getNodeParameter('Tag', i) as string;
+					
+					this.logger.debug('Processing single tag', { tag: Tag });
+					
+					const body: IDataObject = {
+						tags: [{ name: Tag }],
+					};
+					
+					this.logger.debug('Sending single tag request', { 
+						endpoint, 
+						body, 
+						queryParams: qs 
+					});
+					
+					responseData = await zohoApiRequest.call(this, Methods.POST, endpoint, body, qs);
+					
+					this.logger.debug('Single tag created successfully', { 
+						response: responseData 
+					});		
+				}
+				if(operation === Operation.AddTags){
+					const Inputmode = this.getNodeParameter('Inputmode', i);
+					const endpoint=`/${resource}${ModuleEndpoints.AddTags}`
+					if(Inputmode==InputModes.Single){
+						const recordParam = this.getNodeParameter('Recordid', i) as IdLocator;
+						let recordId = recordParam.value;
+						if (recordParam.mode === 'url') {
+							recordId = extractId(resource, recordParam);
+						}
+						const tagId= this.getNodeParameter('Tag', i) as string;
+						const body: IDataObject = {
+							tags: [{id : tagId}], 
+							ids: [recordId],
+						};
+						responseData = await zohoApiRequest.call(this, Methods.POST, endpoint, body);
+						responseData= responseData.data
+					}
+					else if(Inputmode==InputModes.Many){
+						const recordsList = this.getNodeParameter('Recordlist', i) as any;
+						const tagId = this.getNodeParameter('Tag', i) as string;
+						
+						this.logger.debug('Raw recordsList input', { 
+							recordsList,
+							type: typeof recordsList,
+							isArray: Array.isArray(recordsList)
+						});
+						
+						const ids = recordsList
+							.map((record: any) => {
+								if (typeof record === 'string') {
+									return record.trim();
+								}
+								else if (typeof record === 'object' && record !== null) {
+									return record.id || record.Id || record.ID;
+								}
+								return null;
+							})
+							.filter((id: any) => id !== null && id !== undefined && id !== '');
+						
+						this.logger.debug('Extracted IDs from records list', { 
+							originalCount: recordsList.length,
+							extractedCount: ids.length,
+							ids
+						});
+						
+						if (ids.length === 0) {
+							throw new Error('No valid IDs found in the records list.');
+						}
+						
+						const body: IDataObject = {
+							tags: [{id : tagId}], 
+							ids: ids,
+						};
+						
+						this.logger.debug('Sending batched request', { 
+							endpoint,
+							body
+						});
+						
+						const response = await zohoApiRequest.call(
+							this,
+							Methods.POST,
+							endpoint,
+							body,
+						);
+						
+						this.logger.debug('Batched request completed', { 
+							response
+						});
+						
+						responseData = response.data;
+					}
+
 				}
 
 				else if (operation === Operation.GetMany) {

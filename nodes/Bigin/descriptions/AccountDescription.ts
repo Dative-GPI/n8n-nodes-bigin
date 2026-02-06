@@ -1,5 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
-import { makeInputMode, makeRecordsListInput, makeDelete, makeGet, makeGetMany, makeGetPicklistValues, makeGetAll, makeGetModuleCalls, makeGetModuleDeals, makeUpdate, makePatch, makeUpsert } from './SharedFields';
+import { makeInputMode, makeRecordsListInput, makeDelete, makeGet, makeGetMany, makeGetPicklistValues, makeGetAll, makeGetModuleCalls, makeGetModuleDeals, makeUpdate, makePatch, makeUpsert, makeCreateTags, makeAddTags, makeDeleteTags } from './SharedFields';
 
 export const accountOperations: INodeProperties[] = [
 	{
@@ -84,7 +84,7 @@ export const accountOperations: INodeProperties[] = [
 			},
 			{
 				name: 'Tags Add',
-				value: 'Updatetags',
+				value: 'Addtags',
 				description: 'Add available tags to a company',
 				action: 'Add available tags to a company'
 			},
@@ -95,11 +95,18 @@ export const accountOperations: INodeProperties[] = [
 				action: 'Create new company tags'
 			},
 			{
+				name: 'Tags Delete',
+				value: 'Deletetags',
+				description: 'Delete companies tag',
+				action: 'Delete companies tag'
+			},
+			{
 				name: 'Tags Get',
 				value: 'Gettags',
 				description: 'Get companies tags',
 				action: 'Get companies tags'
 			},
+
 			{
 				name: 'Update All Fields',
 				value: 'Update',
@@ -125,23 +132,17 @@ export const accountFields: INodeProperties[] = [
 	...makeUpsert('Accounts'),
 	...makeUpdate('Accounts'),
 	...makePatch('Accounts'),
-	// ----------------------------------------
-	//             account: delete
-	// ----------------------------------------
 	...makeDelete('Accounts'),
 
-	// ----------------------------------------
-	//               account: get
-	// ----------------------------------------
+
 	...makeGet('Accounts'),
 
-	// ----------------------------------------
-	//             account: getAll
-	// ----------------------------------------
 	...makeGetMany('Accounts'),
-
+	...makeAddTags('Accounts'),
+	...makeCreateTags('Accounts'),
 	...makeGetPicklistValues('Accounts'),
 	...makeGetAll('Accounts'),
+	...makeDeleteTags('Accounts'),
 	...makeGetModuleCalls('Accounts'),
 	...makeGetModuleDeals('Accounts'),
 	

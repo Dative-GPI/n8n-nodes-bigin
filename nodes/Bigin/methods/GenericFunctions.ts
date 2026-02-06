@@ -42,6 +42,7 @@ import {
   
   IdLocator,
   MAX_FIELDS,
+  ArrayTag,
 } from '../types';
 import { isBiginDataType } from './ResourceMappingMethods';
 
@@ -73,7 +74,8 @@ export async function zohoApiRequest(
 	this.logger.debug("method: "+method, );
   this.logger.debug("Endpoint:" + endpoint);
 
-  if(!(coqlQuery || endpoint.toString().endsWith('upsert'))){
+  //special body handled in ExecuteMethods
+  if(!(coqlQuery || endpoint.includes('tags') || endpoint.endsWith('upsert'))){
     body = { data: [body] };
   }
 
@@ -425,6 +427,16 @@ this.logger.debug("filter: "+filter)
 	};
 }
 
+export async function GetTags(	this: ILoadOptionsFunctions | IExecuteFunctions, resource : Resource) : Promise<ArrayTag> {
+    const qs: IDataObject = {
+      module: resource,
+    };
+    const endpoint = ModuleEndpoints.Tags;
+    const responseData = await zohoApiRequest.call(this, Methods.GET, endpoint,{},qs);
+    this.logger.debug("Tags", responseData)
+    return responseData.tags
+} 
+
 
 
 
@@ -441,90 +453,97 @@ function buildOrderByClause(orderBy: OrderByClause[]): string {
     .join(', ')}`;
 }
 
-
 export function buildWhereConditions(
-  this: IExecuteFunctions |ILoadOptionsFunctions,
-	whereConditions: IDataObject[],
+  this: IExecuteFunctions | ILoadOptionsFunctions,
+  whereConditions: IDataObject[],
 ): WhereCondition[] {
-      this.logger.debug("in buildWhereConditions")
-
-	return whereConditions
-		.map((c: IDataObject) => {
-			const field = c.Field as string;
-			let operator = c.Operator as string;
-			const value = c.Value;
-      const logic = c.Logic as SearchLogic
-      this.logger.debug("LOGIC: "+logic)
-			if (!field || !operator) return null;
-
-			if (operator === 'equals') {
-				operator = '=';
-			}
-
-			if (operator === 'starts with') {
-				const strVal = String(value ?? '');
-				return {
-					field,
-					operator: 'like',
-					value: strVal.endsWith('%') ? strVal : `${strVal}%`,
-				};
-			}
-
-			if (operator === 'ends with') {
-				const strVal = String(value ?? '');
-				return {
-					field,
-					operator: 'like',
-					value: strVal.startsWith('%') ? strVal : `%${strVal}`,
-				};
-			}
-
-			if (operator === 'like' || operator === 'not like') {
-				const strVal = String(value ?? '');
-				return {
-					field,
-					operator: operator as COQLOperators,
-					value: strVal.includes('%') ? strVal : `%${strVal}%`,
-				};
-			}
-
-			if (operator === 'in' || operator === 'not in') {
-				const listVal = Array.isArray(value)
-					? value.map(String)
-					: String(value ?? '').split(',').map(v => v.trim());
-
-				return {
-					field,
-					operator: operator as COQLOperators,
-					value: listVal,
-				};
-			}
-
-			// if (operator === 'between' || operator === 'not between') {
-			// 	const values = Array.isArray(value)
-			// 		? value
-			// 		: String(value ?? '').split(',').map(v => v.trim());
-
-			// 	return {
-			// 		field,
-			// 		operator: operator as COQLOperators,
-			// 		value: [String(values[0]), String(values[1])],
-			// 	};
-			// }
-
-			if (operator === 'is null' || operator === 'is not null') {
-				return { field, operator: operator as COQLOperators, value: null };
-			}
-
+  this.logger.debug("in buildWhereConditions");
+  return whereConditions
+    .map((c: IDataObject) => {
+      const field = c.Field as string;
+      let operator = c.Operator as string;
+      const value = c.Value;
+      const logic = c.Logic as SearchLogic;
+      
+      this.logger.debug("LOGIC: " + logic);
+      
+      if (!field || !operator) return null;
+      
+      if (operator === 'equals') {
+        operator = '=';
+      }
+      
+      if (operator === 'starts with') {
+        const strVal = String(value ?? '');
+        return {
+          field,
+          operator: 'like',
+          value: strVal.endsWith('%') ? strVal : `${strVal}%`,
+          logic,
+        };
+      }
+      
+      if (operator === 'ends with') {
+        const strVal = String(value ?? '');
+        return {
+          field,
+          operator: 'like',
+          value: strVal.startsWith('%') ? strVal : `%${strVal}`,
+          logic,
+        };
+      }
+      
+      if (operator === 'like' || operator === 'not like') {
+        const strVal = String(value ?? '');
+        return {
+          field,
+          operator: operator as COQLOperators,
+          value: strVal.includes('%') ? strVal : `%${strVal}%`,
+          logic,
+        };
+      }
+      
+      if (operator === 'in' || operator === 'not in') {
+        const listVal = Array.isArray(value)
+          ? value.map(String)
+          : String(value ?? '').split(',').map(v => v.trim());
+        return {
+          field,
+          operator: operator as COQLOperators,
+          value: listVal,
+          logic,
+        };
+      }
+      
+      // if (operator === 'between' || operator === 'not between') {
+      //   const values = Array.isArray(value)
+      //     ? value
+      //     : String(value ?? '').split(',').map(v => v.trim());
+      //   return {
+      //     field,
+      //     operator: operator as COQLOperators,
+      //     value: [String(values[0]), String(values[1])],
+      //     logic,
+      //   };
+      // }
+      
+      if (operator === 'is null' || operator === 'is not null') {
+        return { 
+          field, 
+          operator: operator as COQLOperators, 
+          value: null,
+          logic,
+        };
+      }
+      
       return {
         field,
         operator: operator as COQLOperators,
         value: value !== undefined && value !== null ? String(value) : null,
         logic,
       };
-		})
-		.filter(Boolean) as WhereCondition[];
-
+    })
+    .filter(Boolean) as WhereCondition[];
 }
 
 

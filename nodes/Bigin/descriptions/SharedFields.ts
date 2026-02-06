@@ -189,7 +189,7 @@ export const makeGetFields = (resource: Resource, operations: Operation[]= []): 
 			type: 'multiOptions',
 			required: true,
 			typeOptions: {
-				loadOptionsMethod: `getSearchable${resource}Fields`,
+				loadOptionsMethod: `getSearchableFields`,
 				loadOptionsDependsOn:['resource']
 			},
 			displayOptions: {
@@ -274,23 +274,53 @@ export const makeUpsert = (resource: Resource): INodeProperties[] => {
 }
 
 
-export const makeAddTags = (resource: Resource): INodeProperties[] => {
-	return [
-		{
-			displayName: '',
-			name: '',
-			type: 'string',
-			default: undefined,
-			displayOptions:{
-				show:{
-					resource:[resource],
-					operation:['Addtags'],
-				}
-			}
-		}
-	]
-}
 
+export const makeCreateTags = (resource: Resource): INodeProperties[] => {
+    return [
+        {
+            displayName: 'Tag',
+            name: 'Tag',
+            type: 'string',
+			default: '',
+            displayOptions: {
+                show: {
+                    resource: [resource],
+                    operation: ['Createtags'],
+                },
+            },
+        },
+    ];
+};
+
+
+export const makeAddTags = (resource: Resource): INodeProperties[] => {
+    return [
+		//Multi mode
+		//Handled by basic Resource List	
+
+		//Single Mode
+		...makeInputModeResourceLocator(resource,['Addtags']),
+
+		//Single mode
+        {
+            displayName: 'Tag',
+            name: 'Tag',
+            type: 'options',
+			default: '',
+            placeholder: 'Add Tag',
+			typeOptions:{
+				loadOptionsMethod: `getTags`,
+				loadOptionsDependsOn: [resource],
+			},
+            displayOptions: {
+                show: {
+                    resource: [resource],
+                    operation: ['Addtags'],
+                },
+            },
+        },
+    ];
+};
 
 export const makeSearchFilter = (resource: Resource): INodeProperties[] => {
 
@@ -324,7 +354,7 @@ export const makeSearchFilter = (resource: Resource): INodeProperties[] => {
 							name: 'Field',
 							type: 'options',
 							typeOptions: {
-								loadOptionsMethod: `getFilterable${resource}Fields`,								
+								loadOptionsMethod: `getFilterableFields`,								
 							},
 							default: '',
 						},
@@ -376,7 +406,7 @@ export const makeSearchFilter = (resource: Resource): INodeProperties[] => {
 							displayName: 'Logic',
 							name: 'Logic',
 							type: 'options',
-							default: 'AND',
+							default: 'OR',
 							required: true,
 							options: [
 								{ name: 'AND', value: 'AND' },
@@ -435,7 +465,7 @@ export const makeSearchFilter = (resource: Resource): INodeProperties[] => {
 							name: 'Field',
 							type: 'options',
 							typeOptions: {
-								loadOptionsMethod: `getSortable${resource}Fields`,
+								loadOptionsMethod: `getSortableFields`,
 							},
 							default: '',
 						},
@@ -457,24 +487,26 @@ export const makeSearchFilter = (resource: Resource): INodeProperties[] => {
 };
 
 
+
 export const makeInputMode = (resource: Resource): INodeProperties[] => {
-	     return [   {
-            displayName: 'Input Mode',
-            name: 'Inputmode',
-            type: 'options',
+	return [   
+		{
+			displayName: 'Input Mode',
+			name: 'Inputmode',
+			type: 'options',
 			required:true,
 			default: 'Single',
-            options: [
-                { name: 'Single Record', value: 'Single' },
-                { name: 'Multi Record', value: 'Many' },
-            ],
+			options: [
+				{ name: 'Single Record', value: 'Single' },
+				{ name: 'Multi Record', value: 'Many' },
+			],
 			displayOptions: {
-                show: {
-                    resource: [resource],
-                    operation: ['Upsert','Update','Patch'],
-                },
-            },
-        }
+				show: {
+					resource: [resource],
+					operation: ['Upsert','Update','Patch','Addtags'],
+				},
+			},
+		}
 	]
 }
 
@@ -485,100 +517,122 @@ export const makeDelete = (resource: Resource): INodeProperties[] => {
 };
 
 
+
+export const makeDeleteTags = (resource: Resource): INodeProperties[] => {
+	return [	
+  	{
+            displayName: 'Tag',
+            name: 'Tag',
+            type: 'options',
+			default: '',
+            placeholder: 'Add Tag',
+			typeOptions:{
+				loadOptionsMethod: `getTags`,
+				loadOptionsDependsOn: [resource,'operation'],
+			},
+            displayOptions: {
+                show: {
+                    resource: [resource],
+                    operation: ['Deletetags'],
+                },
+            },
+        },
+	];
+};
+
 export const makeGet = (resource: Resource): INodeProperties[] => {
 	return [
-			...makeGetFields(resource,[Operation.Get]),
-			...makeMaxFieldsNotice(resource,[Operation.Get]),
-			...makeResourceLocator(resource,[Operation.Get]),
-
+		...makeGetFields(resource,[Operation.Get]),
+		...makeMaxFieldsNotice(resource,[Operation.Get]),
+		...makeResourceLocator(resource,[Operation.Get]),
 	];
 };
 
 export const makeUpdate = (resource: Resource): INodeProperties[] => {
 	return [
-			...makeInputModeResourceLocator(resource,['Update']),
-			...makeUpdateWarning(resource)
+		...makeInputModeResourceLocator(resource,['Update']),
+		...makeUpdateWarning(resource)
 	];
 };
 
 
 export const makePatch = (resource: Resource): INodeProperties[] => {
 	return [
-			...makeInputModeResourceLocator(resource,['Patch'])
+		...makeInputModeResourceLocator(resource,['Patch'])
 	];
 };
 
 
 export const makeUpdateWarning = (resource: Resource): INodeProperties[] => {
 	return [
-			{
-				displayName: 'WARNING: Optional Fields that are not selected will be RESET to default. Use Update Specific Fields to preserve data',
-				name: '',
-				type: 'notice',
-				default: 'WARNING: Optional Fields that are not selected will be RESET to default. Use Update Specific Fields to preserve data',
-				displayOptions:{
-					show:{
-						operation:['Update'],
-						resource: [resource]
-					}
+		{
+			displayName: 'WARNING: Optional Fields that are not selected will be RESET to default. Use Update Specific Fields to preserve data',
+			name: '',
+			type: 'notice',
+			default: 'WARNING: Optional Fields that are not selected will be RESET to default. Use Update Specific Fields to preserve data',
+			displayOptions:{
+				show:{
+					operation:['Update'],
+					resource: [resource]
 				}
 			}
+		}
 	];
 };
 
 export const makeResourceLocator = (resource : Resource,operation:Operation[]): INodeProperties[] => {
 	return [
-			{
-				displayName: `${resource}`,
-				name: 'Recordid',
-				description: `Select the ${resource} to retrieve`,
-				type: 'resourceLocator',
-				default: '',
-				typeOptions: {
-					loadOptionsDependsOn: ['resource','operation']
+		{
+			displayName: `${resource}`,
+			name: 'Recordid',
+			description: `Select the ${resource} to retrieve`,
+			type: 'resourceLocator',
+			default: '',
+			typeOptions: {
+				loadOptionsDependsOn: ['resource','operation']
+			},
+			required: true,
+			modes: [
+				{
+					displayName: 'ID',
+					name: 'id',
+					type: 'string',
+					hint: `Enter a ${resource} ID`,
+					placeholder: '123456789',
+					
 				},
-				required: true,
-				modes: [
-					{
-						displayName: 'ID',
-						name: 'id',
-						type: 'string',
-						hint: `Enter a ${resource} ID`,
-						placeholder: '123456789',
-						
-					},
-					{
-						displayName: 'URL',
-						name: 'url',
-						type: 'string',
-						hint: `Paste a ${resource} URL`,
-						placeholder: `https://bigin.zoho.eu/bigin/org20046285116/Home#/${resource.toLowerCase()}/1531990000034496328?section=Potentials`,
-					},
-					{
-						displayName: 'List',
-						name: 'list',
-						type: 'list',
-						typeOptions: {
-							searchListMethod: `search${resource}`,
-							searchable: true,
-							searchFilterRequired: true,
+				{
+					displayName: 'URL',
+					name: 'url',
+					type: 'string',
+					hint: `Paste a ${resource} URL`,
+					placeholder: `https://bigin.zoho.eu/bigin/org20046285116/Home#/${resource.toLowerCase()}/1531990000034496328?section=Potentials`,
+				},
+				{
+					displayName: 'List',
+					name: 'list',
+					type: 'list',
+					typeOptions: {
+						searchListMethod: `search${resource}`,
+						searchable: true,
+						searchFilterRequired: true,
 
-				
-							slowLoadNotice: {
-								message: "Try to search by ID if it takes too long",
-								timeout: 10
-							}	
-						},
+			
+						slowLoadNotice: {
+							message: "Try to search by ID if it takes too long",
+							timeout: 10
+						}	
 					},
-				],
+				},
+			],
 
-				displayOptions: {
-					show: {
-						resource: [resource],
-						operation: operation,
-					},
+			displayOptions: {
+				show: {
+					resource: [resource],
+					operation: operation,
 				},
 			},
+		},
 	];
 }
 
@@ -755,4 +809,5 @@ export const makeRecordsListInput = (resource: Resource): INodeProperties[] => {
         },
     ];
 };
+
 

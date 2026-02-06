@@ -1,7 +1,10 @@
 import type { INodeProperties} from 'n8n-workflow';
 
 import {
+	makeAddTags,
+	makeCreateTags,
 	makeDelete,
+	makeDeleteTags,
 	makeGet,
 	makeGetAll,
 	makeGetMany,
@@ -98,7 +101,7 @@ export const contactOperations: INodeProperties[] = [
 			},
 			{
 				name: 'Tags Add',
-				value: 'Updatetags',
+				value: 'Addtags',
 				description: 'Add available tags to a contact',
 				action: 'Add available tags to a contact'
 			},
@@ -107,6 +110,12 @@ export const contactOperations: INodeProperties[] = [
 				value: 'Createtags',
 				description: 'Create new contact tags',
 				action: 'Create new contact tags'
+			},
+			{
+				name: 'Tags Delete',
+				value: 'Deletetags',
+				description: 'Delete contacts tag',
+				action: 'Delete contacts tag'
 			},
 			{
 				name: 'Tags Get',
@@ -150,7 +159,9 @@ export const contactFields: INodeProperties[] = [
 	...makeDelete('Contacts'),
 
 	...makeGet('Contacts'),
-
+	...makeAddTags('Contacts'),
+	...makeCreateTags('Contacts'),
+	...makeDeleteTags('Contacts'),
 	...makeGetPicklistValues('Contacts'),
 
 	...makeGetMany('Contacts'),

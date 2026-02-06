@@ -45,7 +45,7 @@ export const myListSearch: {
         filter?: string,
         paginationToken?: string,
     ): Promise<INodeListSearchResult> {
-        return searchModule.call(this,Resource.Calls,'Call_Start_Time',['Call_Start_Time','Subject','id'],filter,paginationToken)
+        return searchModule.call(this,Resource.Calls,'Subject',['Call_Start_Time','Subject','id'],filter,paginationToken)
     },
 
     async searchEvents(
@@ -63,5 +63,4 @@ export const myListSearch: {
     ): Promise<INodeListSearchResult> {
         return searchModule.call(this,Resource.Tasks,'Subject',['Subject','Due_Date','id'],filter,paginationToken)
     },
-
 };

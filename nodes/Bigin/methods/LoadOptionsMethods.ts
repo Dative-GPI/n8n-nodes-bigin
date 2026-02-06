@@ -1,6 +1,6 @@
 import { IDataObject, ILoadOptionsFunctions, INodePropertyOptions } from "n8n-workflow";
 import { allAccountFields, BiginDataTypes,  IdLocator,  LoadedAccounts, LoadedContacts, LoadedPipelineLayouts, LoadedProducts, Methods, ModuleEndpoints, Operation, Resource } from "../types";
-import { extractId, getDealSubPipeline, getFieldMetadata, getFields, getFieldsAsString, getFieldsMetadata, getFilterableFields, getOperatorsForType, getPicklistValues, getSearchableFields, getSortableFields, getStages, getSubPipelines, mapMetadataToOptions, toLoadOptions, zohoApiRequest, zohoApiRequestAllItemsBatch, zohoApiRequestAllItemsBatchReturnAll } from "./GenericFunctions";
+import { extractId, getDealSubPipeline, getFieldMetadata, getFields, getFieldsAsString, getFieldsMetadata, getFilterableFields, getOperatorsForType, getPicklistValues, getSearchableFields, getSortableFields, getStages, getSubPipelines, GetTags, mapMetadataToOptions, toLoadOptions, zohoApiRequest, zohoApiRequestAllItemsBatch, zohoApiRequestAllItemsBatchReturnAll } from "./GenericFunctions";
 
 
 export const myLoadOptions: { [key: string]: (this: ILoadOptionsFunctions) => Promise<INodePropertyOptions[]> } = {
@@ -126,46 +126,46 @@ export const myLoadOptions: { [key: string]: (this: ILoadOptionsFunctions) => Pr
             },
 
 
-async getRecordSubPipeline(
-	this: ILoadOptionsFunctions
-): Promise<Array<{ name: string; value: string }>> {
+            async getRecordSubPipeline(
+                this: ILoadOptionsFunctions
+            ): Promise<Array<{ name: string; value: string }>> {
 
-	this.logger.debug('getRecordSubPipeline: start');
+                this.logger.debug('getRecordSubPipeline: start');
 
-	const recordParam = this.getNodeParameter('Recordid') as IdLocator;
-	const resource = this.getNodeParameter('resource') as string;
+                const recordParam = this.getNodeParameter('Recordid') as IdLocator;
+                const resource = this.getNodeParameter('resource') as string;
 
-	this.logger.debug('getRecordSubPipeline: recordParam', {
-		recordParam,
-		resource,
-	});
+                this.logger.debug('getRecordSubPipeline: recordParam', {
+                    recordParam,
+                    resource,
+                });
 
-	let recordId = recordParam.value;
-	if (recordParam.mode === 'url') {
-		recordId = extractId(resource, recordParam);
+                let recordId = recordParam.value;
+                if (recordParam.mode === 'url') {
+                    recordId = extractId(resource, recordParam);
 
-		this.logger.debug('getRecordSubPipeline: extracted recordId from URL', {
-			recordId,
-		});
-	} else {
-		this.logger.debug('getRecordSubPipeline: recordId from value', {
-			recordId,
-		});
-	}
+                    this.logger.debug('getRecordSubPipeline: extracted recordId from URL', {
+                        recordId,
+                    });
+                } else {
+                    this.logger.debug('getRecordSubPipeline: recordId from value', {
+                        recordId,
+                    });
+                }
 
-	const subPipeline = await getDealSubPipeline.call(this, recordId);
+                const subPipeline = await getDealSubPipeline.call(this, recordId);
 
-	this.logger.debug('getRecordSubPipeline: subPipeline received', {
-		subPipeline,
-	});
+                this.logger.debug('getRecordSubPipeline: subPipeline received', {
+                    subPipeline,
+                });
 
-	return [
-		{
-			name: subPipeline,
-			value: subPipeline,
-		},
-	];
-},
+                return [
+                    {
+                        name: subPipeline,
+                        value: subPipeline,
+                    },
+                ];
+            },
 
 
             
@@ -208,163 +208,39 @@ async getRecordSubPipeline(
             //             module fields
             // ----------------------------------------
 
-            //Accounts
-            async getAccountsFields(this: ILoadOptionsFunctions) {
-                const fields = await getFieldsMetadata.call(this, Resource.Accounts);
+            async getFields(this: ILoadOptionsFunctions) {
+                const resource = this.getNodeParameter('resource') as Resource
+                const fields = await getFieldsMetadata.call(this, resource);
                 return mapMetadataToOptions(fields)
             },
 
-            async getSearchableAccountsFields(this: ILoadOptionsFunctions) {
-                const fields = await getSearchableFields.call(this, Resource.Accounts);
+            async getSearchableFields(this: ILoadOptionsFunctions) {
+                const resource = this.getNodeParameter('resource') as Resource
+                const fields = await getSearchableFields.call(this,resource);               
                 return mapMetadataToOptions(fields)
             },
 
-            async getFilterableAccountsFields(this: ILoadOptionsFunctions) {
-                const fields = await getFilterableFields.call(this, Resource.Accounts);              
+            async getFilterableFields(this: ILoadOptionsFunctions) {
+                const resource = this.getNodeParameter('resource') as Resource
+                const fields = await getFilterableFields.call(this, resource);         
                 return mapMetadataToOptions(fields)
             },
 
-            async getSortableAccountsFields(this: ILoadOptionsFunctions) {
-                const fields = await getSortableFields.call(this, Resource.Accounts);               
+            async getSortableFields(this: ILoadOptionsFunctions) {
+                const resource = this.getNodeParameter('resource') as Resource
+                const fields = await getSortableFields.call(this, resource);                
                 return mapMetadataToOptions(fields)
             },
-
-
-            //Contacts
-            async getContactsFields(this: ILoadOptionsFunctions) {
-                const fields = await getFieldsMetadata.call(this, Resource.Contacts);
-                return mapMetadataToOptions(fields)
+     
+            // Tags
+            async getTags(this: ILoadOptionsFunctions) {
+                const resource = this.getNodeParameter('resource') as string
+                const tags= (await GetTags.call(this,resource))
+                return tags.map(s => ({
+                    name: s.name,
+                    value: s.id,
+                }))
             },
-
-            async getSearchableContactsFields(this: ILoadOptionsFunctions) {
-                const fields = await getSearchableFields.call(this, Resource.Contacts);               
-                return mapMetadataToOptions(fields)
-            },
-
-            async getFilterableContactsFields(this: ILoadOptionsFunctions) {
-                const fields = await getFilterableFields.call(this, Resource.Contacts);         
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSortableContactsFields(this: ILoadOptionsFunctions) {
-                const fields = await getSortableFields.call(this, Resource.Contacts);                
-                return mapMetadataToOptions(fields)
-            },
-
-
-            //Pipelines
-            async getPipelinesFields(this: ILoadOptionsFunctions) {
-                const fields = await getFieldsMetadata.call(this, Resource.Pipelines);
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSearchablePipelinesFields(this: ILoadOptionsFunctions) {
-                const fields = await getSearchableFields.call(this, Resource.Pipelines);               
-                return mapMetadataToOptions(fields)
-            },
-
-            async getFilterablePipelinesFields(this: ILoadOptionsFunctions) {
-                const fields = await getFilterableFields.call(this, Resource.Pipelines);             
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSortablePipelinesFields(this: ILoadOptionsFunctions) {
-                const fields = await getSortableFields.call(this, Resource.Pipelines);             
-                return mapMetadataToOptions(fields)
-            },
-
-            
-            //Calls
-            async getCallsFields(this: ILoadOptionsFunctions) {
-                const fields = await getFieldsMetadata.call(this, Resource.Calls);
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSearchableCallsFields(this: ILoadOptionsFunctions) {
-                const fields = await getSearchableFields.call(this, Resource.Calls);            
-                return mapMetadataToOptions(fields)
-            },
-
-            async getFilterableCallsFields(this: ILoadOptionsFunctions) {
-                const fields = await getFilterableFields.call(this, Resource.Calls);               
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSortableCallsFields(this: ILoadOptionsFunctions) {
-                const fields = await getSortableFields.call(this, Resource.Calls);               
-                return mapMetadataToOptions(fields)
-            },
-
-
-
-            //Products
-            async getProductsFields(this: ILoadOptionsFunctions) {
-                const fields = await getFieldsMetadata.call(this, Resource.Products);
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSearchableProductsFields(this: ILoadOptionsFunctions) {
-                const fields = await getSearchableFields.call(this, Resource.Products);            
-                return mapMetadataToOptions(fields)
-            },
-
-            async getFilterableProductsFields(this: ILoadOptionsFunctions) {
-                const fields = await getFilterableFields.call(this, Resource.Products);               
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSortableProductsFields(this: ILoadOptionsFunctions) {
-                const fields = await getSortableFields.call(this, Resource.Products);               
-                return mapMetadataToOptions(fields)
-            },
-
-
-
-            //Tasks
-            async getTasksFields(this: ILoadOptionsFunctions) {
-                const fields = await getFieldsMetadata.call(this, Resource.Tasks);
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSearchableTasksFields(this: ILoadOptionsFunctions) {
-                const fields = await getSearchableFields.call(this, Resource.Tasks);            
-                return mapMetadataToOptions(fields)
-            },
-
-            async getFilterableTasksFields(this: ILoadOptionsFunctions) {
-                const fields = await getFilterableFields.call(this, Resource.Tasks);               
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSortableTasksFields(this: ILoadOptionsFunctions) {
-                const fields = await getSortableFields.call(this, Resource.Tasks);               
-                return mapMetadataToOptions(fields)
-            },
-
-
-
-            //Events
-            async getEventsFields(this: ILoadOptionsFunctions) {
-                const fields = await getFieldsMetadata.call(this, Resource.Events);
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSearchableEventsFields(this: ILoadOptionsFunctions) {
-                const fields = await getSearchableFields.call(this, Resource.Events);            
-                return mapMetadataToOptions(fields)
-            },
-
-            async getFilterableEventsFields(this: ILoadOptionsFunctions) {
-                const fields = await getFilterableFields.call(this, Resource.Events);               
-                return mapMetadataToOptions(fields)
-            },
-
-            async getSortableEventsFields(this: ILoadOptionsFunctions) {
-                const fields = await getSortableFields.call(this, Resource.Events);               
-                return mapMetadataToOptions(fields)
-            },
-
-            
 
 
 
